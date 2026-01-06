@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font: 'Roboto Mono', monospace;
+            --bg: #ffffff;
+            --panel: #ffffff;
+            --text: #000000;
+            --muted: #555555;
+            --border: #000000;
+            --border-soft: #d0d0d0;
+            --surface: #ffffff;
+            --surface-quiet: #f7f7f7;
+            --danger: #b00020;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            border: 1px solid var(--border);
+        }
+
+        .left-panel {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-container {
+            max-width: 100%;
+            max-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .image-wrapper {
+            position: relative;
+            display: inline-block;
+            line-height: 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: calc(100vh - 40px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            display: block;
+            user-select: none;
+        }
+
+        .selection-canvas {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            cursor: crosshair;
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .placeholder {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .right-panel {
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+        }
+
+        .header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 14px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.1s, color 0.1s;
+        }
+
+        .control-btn:hover {
+            background: var(--text);
+            color: var(--surface);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: var(--surface);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .history-item {
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-soft);
+            background: var(--surface-quiet);
+        }
+
+        .history-item-type {
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 10px;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .history-item-message {
+            color: #111111;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .history-empty {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .input-section {
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            gap: 10px;
+        }
+
+        #promptInput {
+            flex: 1;
+            padding: 0 10px;
+            border: 1px solid var(--border);
+            font-size: 12px;
+            background: var(--surface);
+            color: var(--text);
+            height: 36px;
+            line-height: 36px;
+        }
+
+        #promptInput::placeholder {
+            color: #777777;
+        }
+
+        #promptInput:focus {
+            outline: none;
+            border: 1px solid var(--border);
+        }
+
+        #sendBtn {
+            padding: 8px 16px;
+            background: var(--text);
+            color: var(--surface);
+            border: none;
+            font-size: 11px;
+            cursor: pointer;
+            height: 36px;
+            min-width: 70px;
+            transition: background 0.1s;
+        }
+
+        #sendBtn:hover:not(:disabled) {
+            background: #333333;
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status-bar {
+            padding: 6px 15px;
+            background: var(--text);
+            border-top: 1px solid var(--border);
+            font-size: 10px;
+            color: var(--surface);
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cost-display {
+            font-size: 10px;
+            color: var(--surface);
+        }
+
+        .region-tags {
+            padding: 8px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            min-height: 36px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .region-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            background: #f0f0f0;
+            border: 1px solid var(--border);
+            font-size: 10px;
+            color: var(--text);
+        }
+
+        .region-tag-remove {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            background: transparent;
+            border: none;
+            padding: 0 2px;
+        }
+
+        .region-tag-remove:hover {
+            color: var(--text);
+        }
+
+        .region-tags-empty {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .file-input-wrapper {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #imageUpload {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .no-image {
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cccccc;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #999999;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .right-panel {
+                width: 100%;
+            }
+
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="image-container" id="imageContainer">
+                <div class="no-image">NO IMAGE</div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="header">
+                <h1>IMAGE EDITOR</h1>
+            </div>
+
+            <div class="controls">
+                <div class="file-input-wrapper">
+                    <button class="control-btn" onclick="document.getElementById('imageUpload').click()">
+                        UPLOAD IMAGE
+                    </button>
+                    <input type="file" id="imageUpload" accept="image/*" onchange="uploadImage()">
+                </div>
+                <button class="control-btn" onclick="resetSession()">RESET</button>
+            </div>
+
+            <div class="history" id="history">
+                <div class="history-empty">No history yet. Upload an image or enter a prompt to begin.</div>
+            </div>
+
+            <div class="region-tags" id="regionTags">
+                <span class="region-tags-empty">No regions selected. Drag on the image to add one or more areas.</span>
+            </div>
+
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        id="promptInput"
+                        placeholder="Enter prompt..."
+                        onkeydown="if(event.key === 'Enter') { event.preventDefault(); sendPrompt(); }"
+                    />
+                    <button id="sendBtn" onclick="sendPrompt()">SEND</button>
+                </div>
+                <div class="status-bar">
+                    <span id="statusBar">Ready</span>
+                    <span class="cost-display" id="costDisplay">$0.0000</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <script>
+        let isProcessing = false;
+        let history = [];
+        let totalCost = 0.0;
+        // Track all selected regions so multiple areas can be targeted per request.
+        let selectedRegions = [];
+        let selectionId = 0;
+        let canvas = null;
+        let ctx = null;
+        let isDrawing = false;
+        let startX = 0;
+        let startY = 0;
+
+        const selectionStyles = {
+            fill: 'rgba(0, 0, 0, 0.12)',
+            stroke: '#000000',
+            lineWidth: 1
+        };
+
+        function updateStatus(message) {
+            document.getElementById('statusBar').textContent = message;
+        }
+
+        function updateCost(cost) {
+            totalCost = cost;
+            document.getElementById('costDisplay').textContent = `$${cost.toFixed(4)}`;
+        }
+
+        function getRegionDescription(x, y, width, height, imgWidth, imgHeight) {
+            // Translate pixel geometry into a natural language prompt hint.
+            const centerX = x + width / 2;
+            const centerY = y + height / 2;
+
+            const relX = centerX / imgWidth;
+            const relY = centerY / imgHeight;
+            const relWidth = width / imgWidth;
+            const relHeight = height / imgHeight;
+            const regionArea = relWidth * relHeight;
+
+            let vertical = '';
+            let horizontal = '';
+            let size = '';
+            let specificity = '';
+
+            if (relY < 0.25) vertical = 'top';
+            else if (relY < 0.5) vertical = 'upper-middle';
+            else if (relY < 0.75) vertical = 'lower-middle';
+            else vertical = 'bottom';
+
+            if (relX < 0.25) horizontal = 'left';
+            else if (relX < 0.5) horizontal = 'center-left';
+            else if (relX < 0.75) horizontal = 'center-right';
+            else horizontal = 'right';
+
+            if (vertical.includes('middle')) {
+                if (horizontal.includes('center')) {
+                    vertical = '';
+                    horizontal = 'center';
+                }
+            }
+
+            if (regionArea > 0.5) size = 'large';
+            else if (regionArea > 0.25) size = 'medium-sized';
+            else if (regionArea > 0.1) size = 'moderate';
+            else size = 'small, focused';
+
+            const positionParts = [];
+            if (vertical) positionParts.push(vertical);
+            if (horizontal) positionParts.push(horizontal);
+            const position = positionParts.join(' ').trim() || 'center';
+
+            const leftPercent = Math.round((x / imgWidth) * 100);
+            const topPercent = Math.round((y / imgHeight) * 100);
+            const widthPercent = Math.round(relWidth * 100);
+            const heightPercent = Math.round(relHeight * 100);
+
+            return `the ${size} region in the ${position} (spanning ${widthPercent}% x ${heightPercent}% starting at ${leftPercent}% from left, ${topPercent}% from top) - focus changes ONLY within this specific bounded area`;
+        }
+
+        function displayImage(url) {
+            const container = document.getElementById('imageContainer');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-wrapper';
+
+            const img = document.createElement('img');
+            img.id = 'mainImage';
+            img.alt = 'Generated Image';
+            img.src = url;
+
+            wrapper.appendChild(img);
+            container.innerHTML = '';
+            container.appendChild(wrapper);
+
+            // Reset selections because the image context changed.
+            selectedRegions = [];
+            selectionId = 0;
+            updateRegionTags();
+
+            img.onload = () => {
+                canvas = document.createElement('canvas');
+                canvas.id = 'selectionCanvas';
+                canvas.className = 'selection-canvas';
+                canvas.width = img.clientWidth;
+                canvas.height = img.clientHeight;
+
+                wrapper.appendChild(canvas);
+                ctx = canvas.getContext('2d');
+
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseleave', stopDrawing);
+                renderSelections();
+            };
+        }
+
+        function startDrawing(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            startX = (e.clientX - rect.left) * scaleX;
+            startY = (e.clientY - rect.top) * scaleY;
+            isDrawing = true;
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const currentX = (e.clientX - rect.left) * scaleX;
+            const currentY = (e.clientY - rect.top) * scaleY;
+
+            const width = currentX - startX;
+            const height = currentY - startY;
+
+            const previewRegion = {
+                x: startX,
+                y: startY,
+                width,
+                height
+            };
+
+            renderSelections(previewRegion);
+        }
+
+        function stopDrawing(e) {
+            if (!isDrawing) return;
+            isDrawing = false;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const endX = (e.clientX - rect.left) * scaleX;
+            const endY = (e.clientY - rect.top) * scaleY;
+
+            const width = Math.abs(endX - startX);
+            const height = Math.abs(endY - startY);
+
+            if (width > 10 && height > 10) {
+                const x = Math.min(startX, endX);
+                const y = Math.min(startY, endY);
+
+                const description = getRegionDescription(x, y, width, height, canvas.width, canvas.height);
+
+                selectedRegions.push({
+                    id: selectionId++,
+                    x: Math.round(x),
+                    y: Math.round(y),
+                    width: Math.round(width),
+                    height: Math.round(height),
+                    description: description
+                });
+
+                updateRegionTags();
+            }
+
+            renderSelections();
+        }
+
+        function drawSelectionRegion(region, overrides = {}) {
+            if (!ctx) return;
+            const fill = overrides.fill || selectionStyles.fill;
+            const stroke = overrides.stroke || selectionStyles.stroke;
+            const lineWidth = overrides.lineWidth || selectionStyles.lineWidth;
+
+            ctx.fillStyle = fill;
+            ctx.strokeStyle = stroke;
+            ctx.lineWidth = lineWidth;
+            ctx.setLineDash([]);
+            ctx.fillRect(region.x, region.y, region.width, region.height);
+            ctx.strokeRect(region.x, region.y, region.width, region.height);
+        }
+
+        function renderSelections(previewRegion = null) {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            selectedRegions.forEach((region) => {
+                drawSelectionRegion(region);
+            });
+
+            if (previewRegion) {
+                drawSelectionRegion(previewRegion, {
+                    fill: 'rgba(0, 0, 0, 0.08)',
+                    lineWidth: 1
+                });
+            }
+        }
+
+        function updateRegionTags() {
+            const tagsContainer = document.getElementById('regionTags');
+
+            if (selectedRegions.length === 0) {
+                tagsContainer.innerHTML = '<span class="region-tags-empty">No regions selected. Drag on the image to add one or more areas.</span>';
+                return;
+            }
+
+            const baseWidth = canvas ? canvas.width : 1;
+            const baseHeight = canvas ? canvas.height : 1;
+
+            tagsContainer.innerHTML = selectedRegions.map((region, index) => {
+                const widthPercent = Math.round((region.width / baseWidth) * 100);
+                const heightPercent = Math.round((region.height / baseHeight) * 100);
+                const shortDesc = `Selection ${index + 1}: ${widthPercent}% x ${heightPercent}%`;
+
+                return `
+                    <div class="region-tag">
+                        <span>${shortDesc}</span>
+                        <button type="button" class="region-tag-remove" onclick="removeRegion(${region.id})">X</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeRegion(id) {
+            selectedRegions = selectedRegions.filter((region) => region.id !== id);
+            renderSelections();
+            updateRegionTags();
+        }
+
+        function clearRegions() {
+            selectedRegions = [];
+            renderSelections();
+            updateRegionTags();
+        }
+
+        function updateHistory(items) {
+            history = items;
+            const historyEl = document.getElementById('history');
+
+            if (items.length === 0) {
+                historyEl.innerHTML = '<div class="history-empty">No history yet. Upload an image or enter a prompt to begin.</div>';
+                return;
+            }
+
+            historyEl.innerHTML = items.map((item, index) => `
+                <div class="history-item">
+                    <div class="history-item-type">${item.type === 'upload' ? 'UPLOAD' : 'PROMPT'} #${index + 1}</div>
+                    <div class="history-item-message">${item.message}</div>
+                </div>
+            `).join('');
+
+            historyEl.scrollTop = historyEl.scrollHeight;
+        }
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('imageUpload');
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            isProcessing = true;
+            updateStatus('Uploading image...');
+            document.getElementById('sendBtn').disabled = true;
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayImage(data.image_url);
+                    updateHistory(data.history);
+                    updateStatus('Image uploaded');
+                } else {
+                    alert('Error: ' + (data.error || 'Upload failed'));
+                    updateStatus('Upload failed');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                updateStatus('Upload failed');
+            } finally {
+                isProcessing = false;
+                document.getElementById('sendBtn').disabled = false;
+                fileInput.value = '';
+            }
+        }
+
+        async function sendPrompt() {
+            const input = document.getElementById('promptInput');
+            let prompt = input.value.trim();
+
+            if (!prompt || isProcessing) return;
+
+            if (selectedRegions.length > 0) {
+                // Keep the model focused on all selected areas.
+                const regionList = selectedRegions
+                    .map((region, index) => `${index + 1}) ${region.description}`)
+                    .join('\n');
+                prompt = [
+                    'IMPORTANT: Apply the following change ONLY to the listed regions.',
+                    regionList,
+                    `Instruction: "${prompt}".`,
+                    'Do not modify anything outside these specific bounded areas.'
+                ].join('\n');
+            }
+
+            isProcessing = true;
+            updateStatus('Processing...');
+            document.getElementById('sendBtn').disabled = true;
+            input.disabled = true;
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayImage(data.image_url);
+                    updateHistory(data.history);
+                    if (data.total_cost !== undefined) {
+                        updateCost(data.total_cost);
+                    }
+                    clearRegions();
+                    updateStatus('Complete');
+                    input.value = '';
+                } else {
+                    alert('Error: ' + (data.error || 'Processing failed'));
+                    updateStatus('Failed');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                updateStatus('Failed');
+            } finally {
+                isProcessing = false;
+                document.getElementById('sendBtn').disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        async function resetSession() {
+            if (!confirm('Reset session? This will clear all history.')) return;
+
+            try {
+                await fetch('/reset', { method: 'POST' });
+
+                document.getElementById('imageContainer').innerHTML = '<div class="no-image">NO IMAGE</div>';
+                updateHistory([]);
+                document.getElementById('promptInput').value = '';
+                updateCost(0.0);
+                clearRegions();
+                updateStatus('Ready');
+            } catch (error) {
+                alert('Error resetting session');
+            }
+        }
+
+        async function initializeApp() {
+            try {
+                await fetch('/reset', { method: 'POST' });
+
+                document.getElementById('imageContainer').innerHTML = '<div class="no-image">NO IMAGE</div>';
+                updateHistory([]);
+                document.getElementById('promptInput').value = '';
+                updateCost(0.0);
+                clearRegions();
+                updateStatus('Ready');
+            } catch (error) {
+                console.error('Error initializing app:', error);
+            }
+        }
+
+        window.addEventListener('load', initializeApp);
+    </script>
+
+</body>
+</html>
