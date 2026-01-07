@@ -107,6 +107,7 @@ def upload():
 def process():
     data = request.json
     prompt = data.get('prompt')
+    model = data.get('model', 'prunaai/p-image-edit')
 
     if not prompt:
         return jsonify({'error': 'Prompt is required'}), 400
@@ -124,8 +125,8 @@ def process():
         input_image = current_remote_url if current_remote_url else current_image_path
 
         if input_image:
-            # Route edits through Replicate flux-kontext-dev
-            image_url, cost = editor.edit_image(prompt, input_image)
+            # Route edits through Replicate using the selected model
+            image_url, cost = editor.edit_image(prompt, input_image, model=model)
         else:
             cost = generator.calculate_cost(has_input_image=False)
             image_url = generator.generate_image(prompt)

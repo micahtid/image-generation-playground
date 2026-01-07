@@ -105,12 +105,45 @@
             border-bottom: 1px solid var(--border);
             background: var(--surface);
             color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
             font-size: 16px;
             font-weight: 400;
             letter-spacing: 1px;
+        }
+
+        .history-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .history-nav-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.1s, color 0.1s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-nav-btn:hover:not(:disabled) {
+            background: var(--text);
+            color: var(--surface);
+        }
+
+        .history-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
 
         .controls {
@@ -181,6 +214,22 @@
         .input-section {
             border-top: 1px solid var(--border);
             background: var(--surface);
+        }
+
+        .model-selector {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-soft);
+            background: var(--surface-quiet);
+        }
+
+        .model-selector label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text);
         }
 
         .input-wrapper {
@@ -298,6 +347,22 @@
             left: -9999px;
         }
 
+        #modelSelect {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 11px;
+            cursor: pointer;
+            height: 32px;
+        }
+
+        #modelSelect:focus {
+            outline: none;
+            border: 1px solid var(--border);
+        }
+
         .no-image {
             text-align: center;
             color: var(--muted);
@@ -347,6 +412,10 @@
         <div class="right-panel">
             <div class="header">
                 <h1>IMAGE EDITOR</h1>
+                <div class="history-nav">
+                    <button class="history-nav-btn" id="undoBtn" onclick="navigateHistory(-1)" disabled title="Undo">←</button>
+                    <button class="history-nav-btn" id="redoBtn" onclick="navigateHistory(1)" disabled title="Redo">→</button>
+                </div>
             </div>
 
             <div class="controls">
@@ -368,6 +437,14 @@
             </div>
 
             <div class="input-section">
+                <!-- <div class="model-selector">
+                    <label for="modelSelect">EDITING MODEL:</label>
+                    <select id="modelSelect">
+                        <option value="prunaai/p-image-edit">P-Image-Edit (Fast)</option>
+                        <option value="bytedance/seedream-4">SeeDream-4 (High-Res)</option>
+                        <option value="timothybrooks/instruct-pix2pix">InstructPix2Pix (Classic)</option>
+                    </select>
+                </div> -->
                 <div class="input-wrapper">
                     <input
                         type="text"
@@ -398,6 +475,10 @@
         let startX = 0;
         let startY = 0;
 
+        // Image history navigation
+        let imageHistory = [];  // Array of {url, historyState, cost} objects
+        let currentHistoryIndex = -1;  // Current position in history
+
         const selectionStyles = {
             fill: 'rgba(0, 0, 0, 0.12)',
             stroke: '#000000',
@@ -413,55 +494,68 @@
             document.getElementById('costDisplay').textContent = `$${cost.toFixed(4)}`;
         }
 
+        function updateHistoryButtons() {
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+
+            undoBtn.disabled = currentHistoryIndex <= 0;
+            redoBtn.disabled = currentHistoryIndex >= imageHistory.length - 1;
+        }
+
+        function addToImageHistory(url, historyState, cost) {
+            // If we're not at the end of history, truncate future states
+            if (currentHistoryIndex < imageHistory.length - 1) {
+                imageHistory = imageHistory.slice(0, currentHistoryIndex + 1);
+            }
+
+            imageHistory.push({
+                url: url,
+                historyState: historyState,
+                cost: cost
+            });
+
+            currentHistoryIndex = imageHistory.length - 1;
+            updateHistoryButtons();
+        }
+
+        function navigateHistory(direction) {
+            const newIndex = currentHistoryIndex + direction;
+
+            if (newIndex < 0 || newIndex >= imageHistory.length) {
+                return;
+            }
+
+            currentHistoryIndex = newIndex;
+            const state = imageHistory[currentHistoryIndex];
+
+            // Restore the image and history state
+            displayImage(state.url);
+            updateHistory(state.historyState);
+            updateCost(state.cost);
+            updateHistoryButtons();
+        }
+
         function getRegionDescription(x, y, width, height, imgWidth, imgHeight) {
-            // Translate pixel geometry into a natural language prompt hint.
+            // Simple 3x3 grid location - p-image-edit works best with general areas
             const centerX = x + width / 2;
             const centerY = y + height / 2;
 
             const relX = centerX / imgWidth;
             const relY = centerY / imgHeight;
-            const relWidth = width / imgWidth;
-            const relHeight = height / imgHeight;
-            const regionArea = relWidth * relHeight;
 
             let vertical = '';
             let horizontal = '';
-            let size = '';
-            let specificity = '';
 
-            if (relY < 0.25) vertical = 'top';
-            else if (relY < 0.5) vertical = 'upper-middle';
-            else if (relY < 0.75) vertical = 'lower-middle';
-            else vertical = 'bottom';
+            if (relY < 0.33) vertical = 'top';
+            else if (relY > 0.66) vertical = 'bottom';
 
-            if (relX < 0.25) horizontal = 'left';
-            else if (relX < 0.5) horizontal = 'center-left';
-            else if (relX < 0.75) horizontal = 'center-right';
-            else horizontal = 'right';
+            if (relX < 0.33) horizontal = 'left';
+            else if (relX > 0.66) horizontal = 'right';
 
-            if (vertical.includes('middle')) {
-                if (horizontal.includes('center')) {
-                    vertical = '';
-                    horizontal = 'center';
-                }
-            }
-
-            if (regionArea > 0.5) size = 'large';
-            else if (regionArea > 0.25) size = 'medium-sized';
-            else if (regionArea > 0.1) size = 'moderate';
-            else size = 'small, focused';
-
-            const positionParts = [];
-            if (vertical) positionParts.push(vertical);
-            if (horizontal) positionParts.push(horizontal);
-            const position = positionParts.join(' ').trim() || 'center';
-
-            const leftPercent = Math.round((x / imgWidth) * 100);
-            const topPercent = Math.round((y / imgHeight) * 100);
-            const widthPercent = Math.round(relWidth * 100);
-            const heightPercent = Math.round(relHeight * 100);
-
-            return `the ${size} region in the ${position} (spanning ${widthPercent}% x ${heightPercent}% starting at ${leftPercent}% from left, ${topPercent}% from top) - focus changes ONLY within this specific bounded area`;
+            if (vertical && horizontal) return `the ${vertical} ${horizontal}`;
+            if (vertical) return `the ${vertical}`;
+            if (horizontal) return `the ${horizontal}`;
+            return 'the center';
         }
 
         function displayImage(url) {
@@ -607,13 +701,9 @@
                 return;
             }
 
-            const baseWidth = canvas ? canvas.width : 1;
-            const baseHeight = canvas ? canvas.height : 1;
-
             tagsContainer.innerHTML = selectedRegions.map((region, index) => {
-                const widthPercent = Math.round((region.width / baseWidth) * 100);
-                const heightPercent = Math.round((region.height / baseHeight) * 100);
-                const shortDesc = `Selection ${index + 1}: ${widthPercent}% x ${heightPercent}%`;
+                // Show the simple location description
+                const shortDesc = region.description.replace('the ', '').toUpperCase();
 
                 return `
                     <div class="region-tag">
@@ -680,6 +770,9 @@
                     displayImage(data.image_url);
                     updateHistory(data.history);
                     updateStatus('Image uploaded');
+
+                    // Add to image history
+                    addToImageHistory(data.image_url, data.history, 0.0);
                 } else {
                     alert('Error: ' + (data.error || 'Upload failed'));
                     updateStatus('Upload failed');
@@ -701,17 +794,13 @@
             if (!prompt || isProcessing) return;
 
             if (selectedRegions.length > 0) {
-                // Keep the model focused on all selected areas.
-                const regionList = selectedRegions
-                    .map((region, index) => `${index + 1}) ${region.description}`)
-                    .join('\n');
-                prompt = [
-                    'IMPORTANT: Apply the following change ONLY to the listed regions.',
-                    regionList,
-                    `Instruction: "${prompt}".`,
-                    'Do not modify anything outside these specific bounded areas.'
-                ].join('\n');
+                // Simple: [action] in [location]
+                const regionDesc = selectedRegions.map(r => r.description).join(' and ');
+                prompt = `${prompt} in ${regionDesc}`;
             }
+
+            // const selectedModel = document.getElementById('modelSelect').value;
+            const selectedModel = 'prunaai/p-image-edit'; // Only using p-image-edit
 
             isProcessing = true;
             updateStatus('Processing...');
@@ -724,7 +813,10 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ prompt })
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        model: selectedModel
+                    })
                 });
 
                 const data = await response.json();
@@ -738,6 +830,9 @@
                     clearRegions();
                     updateStatus('Complete');
                     input.value = '';
+
+                    // Add to image history
+                    addToImageHistory(data.image_url, data.history, data.total_cost || totalCost);
                 } else {
                     alert('Error: ' + (data.error || 'Processing failed'));
                     updateStatus('Failed');
@@ -765,6 +860,11 @@
                 updateCost(0.0);
                 clearRegions();
                 updateStatus('Ready');
+
+                // Reset image history
+                imageHistory = [];
+                currentHistoryIndex = -1;
+                updateHistoryButtons();
             } catch (error) {
                 alert('Error resetting session');
             }
@@ -780,6 +880,11 @@
                 updateCost(0.0);
                 clearRegions();
                 updateStatus('Ready');
+
+                // Reset image history
+                imageHistory = [];
+                currentHistoryIndex = -1;
+                updateHistoryButtons();
             } catch (error) {
                 console.error('Error initializing app:', error);
             }
