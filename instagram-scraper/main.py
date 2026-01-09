@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 from apify_scraper import scrape_instagram_posts
-from gemini_analyzer import analyze_posts_with_gemini
+from gemini_analyzer import analyze_posts_with_categories
 from config import OUTPUT_DIR
 
 
@@ -105,12 +105,12 @@ def main():
         print(f"Loaded {len(posts)} posts from previous scrape")
         print()
 
-    # Step 2: Analyze with Gemini
-    print("STEP 2: Analyzing design patterns with Gemini...")
+    # Step 2: Analyze with Gemini (Two-Phase Category Analysis)
+    print("STEP 2: Analyzing design patterns with category detection...")
     print("-" * 60)
     try:
-        analysis = analyze_posts_with_gemini(posts)
-        print("Analysis complete")
+        analysis = analyze_posts_with_categories(posts)
+        print("Two-phase analysis complete")
     except Exception as e:
         print(f"Error analyzing posts: {e}")
         return
@@ -139,7 +139,54 @@ def main():
 
     # Print a preview of the analysis
     if isinstance(analysis, dict):
-        if 'design_system' in analysis:
+        # Check for new categorized structure
+        if 'categories' in analysis and 'analysis_metadata' in analysis:
+            metadata = analysis['analysis_metadata']
+            print("Category Analysis Summary:")
+            print("-" * 60)
+            print(f"  Categories detected: {metadata.get('categories_detected', 0)}")
+            print(f"  Primary category: {metadata.get('primary_category', 'N/A')}")
+            print()
+
+            # Print each category
+            for i, cat in enumerate(analysis['categories'], 1):
+                print(f"Category {i}: {cat.get('category_name', 'Unknown')}")
+                print(f"  Posts: {cat.get('post_count', 0)} ({', '.join(map(str, cat.get('posts_included', [])))})")
+                print(f"  Purpose: {cat.get('purpose', 'Unknown')}")
+
+                # Print logo consistency if available
+                if 'consistency_tracking' in cat:
+                    logo_info = cat['consistency_tracking'].get('logo_placement', {})
+                    print(f"  Logo: {logo_info.get('consistency_score', 'Unknown')}")
+
+                # Print design system canvas info if available
+                if 'design_system' in cat and 'canvas' in cat['design_system']:
+                    canvas = cat['design_system']['canvas']
+                    print(f"  Canvas: {canvas.get('width', '?')}x{canvas.get('height', '?')}")
+
+                print()
+
+            # Print universal elements if available
+            if 'universal_design_elements' in analysis:
+                universal = analysis['universal_design_elements']
+                print("Universal Elements (across all posts):")
+                print("-" * 60)
+
+                if 'canvas' in universal and universal['canvas'].get('consistent'):
+                    canvas = universal['canvas']
+                    print(f"  Canvas: {canvas.get('width', 0)}x{canvas.get('height', 0)} (CONSISTENT)")
+
+                if 'fonts' in universal and universal['fonts'].get('consistent'):
+                    fonts = universal['fonts'].get('universal_fonts', [])
+                    print(f"  Fonts: {', '.join(fonts)} (CONSISTENT)")
+
+                if 'logo' in universal and universal['logo'].get('consistent_position'):
+                    logo_pos = universal['logo'].get('universal_position', 'unknown')
+                    print(f"  Logo: Always {logo_pos} (CONSISTENT)")
+
+                print()
+        # Fallback for old structure (backward compatibility)
+        elif 'design_system' in analysis:
             ds = analysis['design_system']
             print("Design System Summary:")
             print("-" * 60)
@@ -148,25 +195,12 @@ def main():
             if 'colors' in ds:
                 colors = ds['colors']
                 print(f"  Colors:")
-                for name, color in colors.items():
+                for name, color in list(colors.items())[:3]:  # Limit to first 3 colors
                     if isinstance(color, dict):
                         print(f"    {name}: {color.get('name', '?')} ({color.get('hex', '?')})")
             if 'typography' in ds and 'headline' in ds['typography']:
                 print(f"  Headline Font: {ds['typography']['headline'].get('font_family', '?')}")
-
-        if 'prompt_template' in analysis:
             print()
-            print("Prompt Template:")
-            print("-" * 60)
-            print(analysis['prompt_template'])
-
-        if 'generation_instructions' in analysis:
-            gi = analysis['generation_instructions']
-            if 'forbidden' in gi:
-                print()
-                print("Forbidden (will NOT appear in generated images):")
-                for item in gi['forbidden'][:3]:
-                    print(f"  - {item}")
 
     print()
     print("All done!")

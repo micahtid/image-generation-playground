@@ -2,12 +2,74 @@ import base64
 import json
 import re
 import time
+from datetime import datetime
 from io import BytesIO
 
 import requests
 from PIL import Image
 
 from config import OPENROUTER_API_KEY, OPENROUTER_API_URL, OPENROUTER_MODEL, MAX_IMAGES_PER_POST
+
+
+CATEGORY_DETECTION_PROMPT = """
+You are analyzing 5 Instagram posts to identify HOLISTIC TREND CATEGORIES.
+
+A category is defined by CONTENT THEME + VISUAL STYLE combined:
+- Content theme: What the post is about (activism call-to-action, behind-the-scenes, testimonial, announcement, educational content, product showcase, community spotlight)
+- Visual style: How it's presented (vibrant gradients, minimalist text-only, photo-heavy collage, nature-inspired, bold typography, soft pastels)
+- Purpose correlation: Track if certain purposes always use certain themes (e.g., "All announcements use landscape photography")
+
+CRITICAL RULES:
+1. Categories are NOT component-level details (don't say "minimalist text overlays" - instead say "Educational content with minimalist text-on-solid-background style")
+2. Define categories based on the OVERALL design of each post as a whole
+3. Identify 2-4 categories (don't over-segment into 5 separate categories for 5 posts)
+4. A category needs at least 2 posts to be valid (exception: if Post 1 doesn't fit any multi-post category, it gets its own)
+5. Post 1 (newest) ALWAYS gets included in a category OR defines a new one if truly unique
+6. Track logo placement consistency PER CATEGORY (not globally)
+7. Color palettes CAN BE categories themselves (e.g., "Vibrant pink announcements" vs "Muted pastel announcements")
+8. A category CAN have multiple color palettes (e.g., "Nature posts" might use both "Spring greens" and "Autumn oranges")
+
+IMPORTANT: Identify universal elements that are CONSISTENT across ALL 5 posts (100% consistency):
+- Canvas dimensions (do all posts use the same size?)
+- Logo position (does logo appear in the exact same place in every post?)
+- Fonts (are the same fonts used across all posts?)
+- Brand colors (do the same core brand colors appear in every post?)
+
+OUTPUT JSON:
+{
+  "categories": [
+    {
+      "category_id": "unique_snake_case_id",
+      "category_name": "Human-readable name combining content + visual style",
+      "category_description": "2-3 sentences describing the holistic theme. Focus on what defines this category as a whole.",
+      "post_assignments": [1, 4],
+      "purpose": "call_to_action",
+      "purpose_correlation": "All CTAs use vibrant gradients" or "Mixed purposes within this style",
+      "color_palette_notes": "Single consistent palette: candy pink + royal blue" or "Multiple palettes: warm tones for indoor, cool for outdoor",
+      "logo_consistency": "ALWAYS bottom-right" or "MOSTLY bottom-left (75%)" or "VARIABLE"
+    }
+  ],
+  "universal_elements": {
+    "canvas_consistent": true,
+    "canvas_dimensions": {"width": 1080, "height": 1350, "aspect_ratio": "4:5"},
+    "logo_position_consistent": true,
+    "universal_logo_position": "top-right",
+    "fonts_consistent": true,
+    "universal_fonts": ["League Spartan", "Dancing Script", "Montserrat"],
+    "brand_colors_present": true,
+    "core_brand_colors": [
+      {"hex": "#FF58C1", "name": "vibrant candy pink"},
+      {"hex": "#005EB8", "name": "royal blue"}
+    ]
+  }
+}
+
+REMEMBER:
+- Categories should be holistic (content + visual style together)
+- Focus on what makes each post's OVERALL design distinctive
+- Universal elements are those that appear in ALL 5 posts without exception
+- Per-category tracking captures variations within each trend
+"""
 
 
 ANALYSIS_PROMPT = """
@@ -303,7 +365,7 @@ The prompt_template is for image generation AI (DALL-E, Midjourney, etc).
     "avoid": ["dark colors", "harsh shadows", "cluttered layouts", "thin fonts"]
   }},
 
-  "prompt_template": "YOUR TASK: Write a detailed natural language prompt here that describes the COMPLETE design. This prompt will be given to an image generation AI. It must describe every element, its position, its styling, and its relationship to other elements and edges. Use color NAMES not hex codes. Use relative sizes (large, medium, small) not percentages. Describe edge relationships explicitly (extends to bottom edge, has margin on all sides, etc.). An artist reading this should be able to recreate the design exactly.",
+  "prompt_template": "YOUR TASK: Write a detailed natural language prompt here that describes the COMPLETE design. This prompt will be given to an image generation AI. It must describe every element, its position, its styling, and its relationship to other elements and edges. Use color NAMES not hex codes. Use relative sizes (large, medium, small) not percentages. Describe the full spatial extent of every element (where it starts AND ends in all directions), not just its starting position. An artist reading this should be able to recreate the design exactly.",
 
   "generation_instructions": {{
     "required": [
@@ -430,6 +492,8 @@ The prompt_template is for image generation AI (DALL-E, Midjourney, etc).
 Every description must be EXHAUSTIVELY SPECIFIC. An image generator should have ZERO questions. If there is ANY room for interpretation, you have FAILED.
 
 **THE GOLDEN RULE**: After reading your output, an artist in a completely different country who has NEVER seen the original posts should be able to recreate the design with 95%+ accuracy. If they would need to guess ANYTHING, your description is incomplete.
+
+**SPATIAL COMPLETENESS**: For every element, describe its FULL extent in all directions - not just where it starts, but where it ends. State explicit boundaries: "extends from X to Y" or "fills the entire bottom third" or "occupies 50% width centered". Never describe only position without also describing complete coverage.
 
 **FOR EVERY ELEMENT YOU IDENTIFY, SPECIFY:**
 
@@ -757,6 +821,662 @@ def analyze_posts_with_gemini(posts):
         analysis_json = {"raw_analysis": analysis_text, "error": "Failed to parse JSON"}
 
     return analysis_json
+
+
+def detect_categories(posts):
+    """
+    Phase 1: Detect trend categories from posts.
+    Returns category metadata including post assignments and universal elements.
+    """
+    # Prepare posts metadata - Post 1 is NEWEST
+    posts_for_analysis = []
+    for i, post in enumerate(posts, 1):
+        post_data = {
+            "post_number": i,
+            "is_newest": i == 1,
+            "url": post.get('url', 'N/A'),
+            "caption": post.get('caption', 'N/A')[:200],  # First 200 chars
+            "type": post.get('type', 'N/A'),
+            "timestamp": post.get('timestamp', 'N/A')
+        }
+        posts_for_analysis.append(post_data)
+
+    # Collect all image URLs
+    image_urls = collect_image_urls(posts)
+    print(f"Phase 1: Category Detection - Found {len(image_urls)} images across {len(posts)} posts")
+
+    # Build multimodal content array
+    content = []
+
+    # Add the category detection prompt
+    formatted_prompt = CATEGORY_DETECTION_PROMPT + "\n\nHere are the posts to analyze:\n" + json.dumps(posts_for_analysis, indent=2)
+    content.append({
+        "type": "text",
+        "text": formatted_prompt
+    })
+
+    # Download and add images as base64 (use lower resolution for Phase 1 to save tokens)
+    print("Downloading images for category detection...")
+    successful_images = 0
+    for post_num, img_num, url in image_urls:
+        print(f"  Downloading Post {post_num}, Image {img_num}...")
+        base64_data, media_type = download_image_as_base64(url)
+
+        if base64_data:
+            content.append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:{media_type};base64,{base64_data}"
+                }
+            })
+            successful_images += 1
+        else:
+            print(f"  Skipping Post {post_num}, Image {img_num} (download failed)")
+
+    print(f"Successfully downloaded {successful_images}/{len(image_urls)} images")
+
+    if successful_images == 0:
+        raise Exception("No images could be downloaded for category detection")
+
+    print("Sending posts to Gemini for category detection...")
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": OPENROUTER_MODEL,
+        "messages": [
+            {
+                "role": "user",
+                "content": content
+            }
+        ]
+    }
+
+    # Retry logic for API call
+    max_retries = 3
+    response = None
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(
+                OPENROUTER_API_URL,
+                headers=headers,
+                json=payload,
+                timeout=120
+            )
+            break
+        except requests.exceptions.RequestException as e:
+            if attempt < max_retries - 1:
+                wait_time = (attempt + 1) * 5
+                print(f"  API connection failed, retry {attempt + 1}/{max_retries} in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                raise Exception(f"API connection failed after {max_retries} attempts: {e}")
+
+    if response is None or response.status_code != 200:
+        error_msg = response.text if response else "No response"
+        raise Exception(f"OpenRouter API error: {error_msg}")
+
+    response_data = response.json()
+    category_text = response_data['choices'][0]['message']['content']
+
+    print("Category detection complete!")
+
+    # Clean up response - remove markdown if present
+    category_text = category_text.strip()
+    if category_text.startswith("```json"):
+        category_text = category_text[7:]
+    if category_text.startswith("```"):
+        category_text = category_text[3:]
+    if category_text.endswith("```"):
+        category_text = category_text[:-3]
+    category_text = category_text.strip()
+
+    try:
+        category_json = json.loads(category_text)
+    except json.JSONDecodeError as e:
+        print(f"Warning: Could not parse JSON response: {e}")
+        print("Raw response:", category_text[:500])
+        category_json = {
+            "categories": [
+                {
+                    "category_id": "fallback_all_posts",
+                    "category_name": "All Posts",
+                    "category_description": "Failed to detect categories, treating all as one category",
+                    "post_assignments": list(range(1, len(posts) + 1)),
+                    "purpose": "mixed",
+                    "purpose_correlation": "Failed to detect",
+                    "color_palette_notes": "Unknown",
+                    "logo_consistency": "Unknown"
+                }
+            ],
+            "universal_elements": {
+                "canvas_consistent": False,
+                "logo_position_consistent": False,
+                "fonts_consistent": False,
+                "brand_colors_present": False
+            }
+        }
+
+    return category_json
+
+
+def filter_posts_by_category(posts, category_metadata):
+    """Extract posts belonging to a specific category."""
+    post_numbers = category_metadata['post_assignments']
+    return [posts[i-1] for i in post_numbers]  # Convert 1-indexed to 0-indexed
+
+
+def extract_universal_elements(category_data, category_analyses):
+    """
+    Identify elements that appear in ALL 5 posts (100% consistency).
+    Extract: canvas dimensions, fonts, logo position, brand colors.
+    """
+    universal_elements = category_data.get('universal_elements', {})
+
+    # Build comprehensive universal design elements section
+    result = {
+        "description": "Design elements that are CONSISTENT across ALL posts, regardless of category"
+    }
+
+    # Canvas
+    if universal_elements.get('canvas_consistent'):
+        canvas_dims = universal_elements.get('canvas_dimensions', {})
+        result["canvas"] = {
+            "width": canvas_dims.get('width', 1080),
+            "height": canvas_dims.get('height', 1350),
+            "aspect_ratio": canvas_dims.get('aspect_ratio', '4:5'),
+            "note": "All posts use the same canvas dimensions"
+        }
+    else:
+        result["canvas"] = {
+            "consistent": False,
+            "note": "Canvas dimensions vary across posts"
+        }
+
+    # Fonts
+    if universal_elements.get('fonts_consistent'):
+        result["fonts"] = {
+            "consistent": True,
+            "universal_fonts": universal_elements.get('universal_fonts', []),
+            "note": "These fonts appear across all categories"
+        }
+    else:
+        result["fonts"] = {
+            "consistent": False,
+            "note": "Font usage varies by category"
+        }
+
+    # Logo
+    if universal_elements.get('logo_position_consistent'):
+        result["logo"] = {
+            "consistent_position": True,
+            "universal_position": universal_elements.get('universal_logo_position', 'unknown'),
+            "consistency_score": "ALWAYS (100%)",
+            "note": f"Logo always appears in {universal_elements.get('universal_logo_position', 'unknown')} across all posts"
+        }
+    else:
+        result["logo"] = {
+            "consistent_position": False,
+            "note": "Logo position varies by category (see per-category tracking)"
+        }
+
+    # Brand colors
+    if universal_elements.get('brand_colors_present'):
+        result["brand_colors"] = {
+            "core_colors": universal_elements.get('core_brand_colors', []),
+            "note": "These brand colors appear in every post, though usage varies by category"
+        }
+    else:
+        result["brand_colors"] = {
+            "note": "No consistent brand colors detected across all posts"
+        }
+
+    # Other universal elements (detected from category analyses)
+    result["other_universal_elements"] = []
+    result["note"] = "When generating new posts, ALWAYS include these universal elements unless specifically instructed otherwise"
+
+    return result
+
+
+def infer_cross_category_patterns(category_analyses):
+    """
+    Compare patterns across categories.
+    Identifies: logo positions, font consistency, color palette strategies, carousel usage.
+    """
+    if not category_analyses:
+        return {}
+
+    # Analyze logo consistency across categories
+    logo_positions = []
+    for cat in category_analyses:
+        logo_tracking = cat.get('consistency_tracking', {}).get('logo_placement', {})
+        if logo_tracking.get('primary_position'):
+            logo_positions.append(logo_tracking['primary_position'])
+
+    unique_logo_positions = list(set(logo_positions))
+    if len(unique_logo_positions) == 1:
+        global_logo = f"CONSISTENT - logo always {unique_logo_positions[0]} across all posts"
+    elif len(unique_logo_positions) <= 2:
+        global_logo = f"MOSTLY CONSISTENT - logo typically in {' or '.join(unique_logo_positions)}"
+    else:
+        global_logo = f"VARIABLE - logo varies by category ({', '.join(unique_logo_positions)})"
+
+    # Analyze font consistency
+    all_fonts = set()
+    for cat in category_analyses:
+        design_system = cat.get('design_system', {})
+        typography = design_system.get('typography', {})
+        for text_style in typography.values():
+            if isinstance(text_style, dict) and 'font_family' in text_style:
+                all_fonts.add(text_style['font_family'])
+
+    if len(all_fonts) > 0:
+        font_consistency = f"CONSISTENT - {', '.join(sorted(all_fonts))} used across all categories"
+    else:
+        font_consistency = "Unknown - no font data available"
+
+    # Analyze color palette strategy
+    palette_notes = [cat.get('color_palette_notes', '') for cat in category_analyses]
+    if any('multiple' in note.lower() for note in palette_notes):
+        color_strategy = "Category-specific palettes with some categories using multiple palettes"
+    elif len(set(palette_notes)) == 1:
+        color_strategy = "Uniform color palette across all categories"
+    else:
+        color_strategy = "Category-specific palettes using universal brand colors"
+
+    # Analyze carousel usage
+    carousel_usage = []
+    for cat in category_analyses:
+        cat_name = cat.get('category_name', 'Unknown')
+        image_sequence = cat.get('image_sequence', {})
+        is_carousel = image_sequence.get('is_carousel', False)
+        carousel_usage.append(f"{cat_name}: {'carousel' if is_carousel else 'single image'}")
+
+    # Analyze canvas consistency
+    canvas_sizes = set()
+    for cat in category_analyses:
+        canvas = cat.get('design_system', {}).get('canvas', {})
+        if canvas:
+            canvas_sizes.add(f"{canvas.get('width', 'unknown')}x{canvas.get('height', 'unknown')}")
+
+    canvas_consistency = "CONSISTENT - All posts use same dimensions" if len(canvas_sizes) <= 1 else "VARIABLE - Multiple canvas sizes detected"
+
+    return {
+        "global_logo_consistency": global_logo,
+        "font_consistency": font_consistency,
+        "color_palette_strategy": color_strategy,
+        "carousel_usage": ", ".join(carousel_usage) if carousel_usage else "No carousel data",
+        "canvas_consistency": canvas_consistency
+    }
+
+
+def build_category_selector(category_data):
+    """
+    Extract keywords from category names/descriptions.
+    Build matching rules for auto-selection during generation.
+    """
+    if 'categories' not in category_data:
+        return {
+            "available_categories": [],
+            "selection_logic": {}
+        }
+
+    available_categories = [cat['category_id'] for cat in category_data['categories']]
+    selection_logic = {}
+
+    # Common keyword patterns for different purposes
+    purpose_keywords = {
+        "call_to_action": ["apply", "join", "recruit", "volunteer", "hiring", "position", "sign up", "register"],
+        "announcement": ["deadline", "announcement", "reminder", "save the date", "upcoming", "launching", "new"],
+        "storytelling": ["story", "impact", "event", "community", "volunteers", "testimonial", "experience"],
+        "educational": ["learn", "guide", "how to", "tips", "tutorial", "facts", "information"],
+        "testimonial": ["testimonial", "review", "feedback", "experience", "story", "success"],
+        "behind_the_scenes": ["behind", "team", "process", "making", "work", "volunteers"],
+        "product": ["product", "service", "feature", "offer", "sale", "discount", "pricing"]
+    }
+
+    for cat in category_data['categories']:
+        cat_id = cat['category_id']
+        cat_name = cat['category_name'].lower()
+        cat_desc = cat['category_description'].lower()
+        cat_purpose = cat.get('purpose', '').lower()
+
+        # Extract keywords from category name and description
+        keywords = []
+
+        # Add purpose-specific keywords
+        if cat_purpose in purpose_keywords:
+            keywords.extend(purpose_keywords[cat_purpose])
+
+        # Add keywords from category name (split by spaces and common separators)
+        name_words = cat_name.replace('-', ' ').replace('_', ' ').split()
+        keywords.extend([word for word in name_words if len(word) > 3])  # Words longer than 3 chars
+
+        # Content indicators from description
+        content_indicators = []
+        if "gradient" in cat_desc:
+            content_indicators.append("uses gradients or vibrant colors")
+        if "photo" in cat_desc or "image" in cat_desc:
+            content_indicators.append("features photographs or imagery")
+        if "text" in cat_desc:
+            content_indicators.append("text-heavy content")
+        if "nature" in cat_desc or "landscape" in cat_desc:
+            content_indicators.append("nature or landscape themes")
+
+        selection_logic[cat_id] = {
+            "keywords": list(set(keywords)),  # Remove duplicates
+            "content_indicators": content_indicators,
+            "purpose": cat_purpose
+        }
+
+    return {
+        "available_categories": available_categories,
+        "selection_logic": selection_logic
+    }
+
+
+def assemble_final_json(category_data, category_analyses, posts):
+    """
+    Combine Phase 1 + Phase 2 results.
+    Add analysis_metadata, universal_design_elements, cross_category_patterns, generation_category_selector.
+    """
+    from datetime import datetime
+
+    primary_category_id = category_data['categories'][0]['category_id'] if category_data['categories'] else None
+
+    return {
+        "analysis_metadata": {
+            "total_posts_analyzed": len(posts),
+            "categories_detected": len(category_data['categories']),
+            "analysis_timestamp": datetime.now().isoformat(),
+            "primary_category": primary_category_id
+        },
+        "categories": category_analyses,
+        "universal_design_elements": extract_universal_elements(category_data, category_analyses),
+        "cross_category_patterns": infer_cross_category_patterns(category_analyses),
+        "generation_category_selector": build_category_selector(category_data)
+    }
+
+
+def analyze_category_with_gemini(posts, category_metadata):
+    """
+    Phase 2: Analyze a specific category's design system.
+    Takes posts filtered to a single category and the category metadata from Phase 1.
+    """
+    category_id = category_metadata['category_id']
+    category_name = category_metadata['category_name']
+    category_description = category_metadata['category_description']
+
+    print(f"Phase 2: Analyzing category '{category_name}' ({len(posts)} posts)...")
+
+    # Prepare posts metadata
+    posts_for_analysis = []
+    for i, post in enumerate(posts, 1):
+        post_data = {
+            "post_number": i,
+            "url": post.get('url', 'N/A'),
+            "caption": post.get('caption', 'N/A'),
+            "type": post.get('type', 'N/A'),
+            "timestamp": post.get('timestamp', 'N/A')
+        }
+        posts_for_analysis.append(post_data)
+
+    # Collect all image URLs for this category's posts
+    image_urls = collect_image_urls(posts)
+    print(f"  Found {len(image_urls)} images for this category")
+
+    # Build multimodal content array
+    content = []
+
+    # Modify the ANALYSIS_PROMPT to include category context
+    category_context = f"""
+CATEGORY CONTEXT:
+These posts belong to the "{category_name}" category.
+Category description: {category_description}
+
+Focus your analysis on the design patterns specific to this category.
+"""
+
+    formatted_prompt = category_context + "\n" + ANALYSIS_PROMPT.format(
+        posts_data=json.dumps(posts_for_analysis, indent=2)
+    )
+
+    content.append({
+        "type": "text",
+        "text": formatted_prompt
+    })
+
+    # Download and add images as base64
+    print("  Downloading images for analysis...")
+    successful_images = 0
+    for post_num, img_num, url in image_urls:
+        base64_data, media_type = download_image_as_base64(url)
+
+        if base64_data:
+            content.append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:{media_type};base64,{base64_data}"
+                }
+            })
+            successful_images += 1
+
+    print(f"  Successfully downloaded {successful_images}/{len(image_urls)} images")
+
+    if successful_images == 0:
+        raise Exception(f"No images could be downloaded for category '{category_name}'")
+
+    print(f"  Sending to Gemini for analysis...")
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": OPENROUTER_MODEL,
+        "messages": [
+            {
+                "role": "user",
+                "content": content
+            }
+        ]
+    }
+
+    # Retry logic for API call
+    max_retries = 3
+    response = None
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(
+                OPENROUTER_API_URL,
+                headers=headers,
+                json=payload,
+                timeout=120
+            )
+            break
+        except requests.exceptions.RequestException as e:
+            if attempt < max_retries - 1:
+                wait_time = (attempt + 1) * 5
+                print(f"    API connection failed, retry {attempt + 1}/{max_retries} in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                raise Exception(f"API connection failed after {max_retries} attempts: {e}")
+
+    if response is None or response.status_code != 200:
+        error_msg = response.text if response else "No response"
+        raise Exception(f"OpenRouter API error: {error_msg}")
+
+    response_data = response.json()
+    analysis_text = response_data['choices'][0]['message']['content']
+
+    print(f"  Analysis complete for category '{category_name}'")
+
+    # Clean up response - remove markdown if present
+    analysis_text = analysis_text.strip()
+    if analysis_text.startswith("```json"):
+        analysis_text = analysis_text[7:]
+    if analysis_text.startswith("```"):
+        analysis_text = analysis_text[3:]
+    if analysis_text.endswith("```"):
+        analysis_text = analysis_text[:-3]
+    analysis_text = analysis_text.strip()
+
+    try:
+        analysis_json = json.loads(analysis_text)
+        validate_prompt_template(analysis_json)
+    except json.JSONDecodeError as e:
+        print(f"  Warning: Could not parse JSON response: {e}")
+        print("  Raw response:", analysis_text[:500])
+        analysis_json = {"raw_analysis": analysis_text, "error": "Failed to parse JSON"}
+
+    # Add category metadata to the analysis
+    analysis_json['category_id'] = category_id
+    analysis_json['category_name'] = category_name
+    analysis_json['category_description'] = category_description
+    analysis_json['posts_included'] = category_metadata.get('post_assignments', [])
+    analysis_json['post_count'] = len(posts)
+    analysis_json['purpose'] = category_metadata.get('purpose', 'unknown')
+    analysis_json['purpose_correlation'] = category_metadata.get('purpose_correlation', 'Unknown')
+    analysis_json['color_palette_notes'] = category_metadata.get('color_palette_notes', 'Unknown')
+
+    # Add consistency tracking
+    logo_consistency = category_metadata.get('logo_consistency', 'Unknown')
+    if logo_consistency.startswith('ALWAYS'):
+        consistency_score = "ALWAYS (100%)"
+        variations = []
+    elif logo_consistency.startswith('MOSTLY'):
+        consistency_score = "MOSTLY (75%)"
+        variations = [{"note": "Minor variations detected"}]
+    else:
+        consistency_score = "VARIABLE"
+        variations = [{"note": "Logo position varies within this category"}]
+
+    analysis_json['consistency_tracking'] = {
+        "logo_placement": {
+            "primary_position": category_metadata.get('logo_consistency', 'Unknown').split()[-1] if logo_consistency != 'VARIABLE' else 'varies',
+            "consistency_score": consistency_score,
+            "variations": variations
+        },
+        "color_scheme": {
+            "consistent": 'multiple' not in category_metadata.get('color_palette_notes', '').lower(),
+            "palette_variations": []
+        }
+    }
+
+    return analysis_json
+
+
+def analyze_posts_with_categories(posts):
+    """
+    Full two-phase analysis with category detection and per-category analysis.
+    1. Detect categories (Phase 1)
+    2. Analyze each category in parallel (Phase 2)
+    3. Assemble final JSON structure
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    print("=" * 60)
+    print("STARTING TWO-PHASE CATEGORY ANALYSIS")
+    print("=" * 60)
+    print()
+
+    # Phase 1: Detect categories
+    print("=" * 60)
+    print("PHASE 1: CATEGORY DETECTION")
+    print("=" * 60)
+    category_data = detect_categories(posts)
+
+    if 'categories' not in category_data or len(category_data['categories']) == 0:
+        print("Warning: No categories detected, falling back to single analysis")
+        # Fallback: analyze all posts as one category
+        analysis = analyze_posts_with_gemini(posts)
+        return {
+            "analysis_metadata": {
+                "total_posts_analyzed": len(posts),
+                "categories_detected": 1,
+                "analysis_timestamp": datetime.now().isoformat(),
+                "primary_category": "fallback_single_category",
+                "note": "Category detection failed, using fallback single analysis"
+            },
+            "categories": [
+                {
+                    "category_id": "fallback_single_category",
+                    "category_name": "All Posts",
+                    "category_description": "All posts analyzed as single category (fallback)",
+                    "posts_included": list(range(1, len(posts) + 1)),
+                    "post_count": len(posts),
+                    "purpose": "mixed",
+                    **analysis
+                }
+            ],
+            "universal_design_elements": extract_universal_elements(category_data, [analysis]),
+            "cross_category_patterns": {},
+            "generation_category_selector": {"available_categories": ["fallback_single_category"], "selection_logic": {}}
+        }
+
+    num_categories = len(category_data['categories'])
+    print(f"\nDetected {num_categories} categories:")
+    for cat in category_data['categories']:
+        print(f"  - {cat['category_name']} ({len(cat.get('post_assignments', []))} posts)")
+    print()
+
+    # Phase 2: Analyze each category in parallel
+    print("=" * 60)
+    print("PHASE 2: PER-CATEGORY ANALYSIS (PARALLEL)")
+    print("=" * 60)
+
+    category_analyses = []
+
+    # Use ThreadPoolExecutor for parallel API calls
+    with ThreadPoolExecutor(max_workers=min(num_categories, 3)) as executor:  # Max 3 parallel requests
+        future_to_category = {}
+
+        for category_metadata in category_data['categories']:
+            # Filter posts for this category
+            category_posts = filter_posts_by_category(posts, category_metadata)
+
+            # Submit analysis task
+            future = executor.submit(analyze_category_with_gemini, category_posts, category_metadata)
+            future_to_category[future] = category_metadata['category_name']
+
+        # Collect results as they complete
+        for future in as_completed(future_to_category):
+            category_name = future_to_category[future]
+            try:
+                category_analysis = future.result()
+                category_analyses.append(category_analysis)
+                print(f"  [OK] Completed analysis for: {category_name}")
+            except Exception as e:
+                print(f"  [ERROR] Error analyzing category '{category_name}': {e}")
+                # Add fallback empty analysis
+                category_analyses.append({
+                    "category_name": category_name,
+                    "error": str(e),
+                    "note": "Analysis failed for this category"
+                })
+
+    print()
+    print(f"Completed analysis for {len(category_analyses)}/{num_categories} categories")
+    print()
+
+    # Phase 3: Assemble final JSON
+    print("=" * 60)
+    print("PHASE 3: ASSEMBLING FINAL RESULTS")
+    print("=" * 60)
+
+    final_result = assemble_final_json(category_data, category_analyses, posts)
+
+    print("[OK] Assembly complete!")
+    print()
+    print("=" * 60)
+    print("TWO-PHASE ANALYSIS COMPLETE")
+    print("=" * 60)
+
+    return final_result
 
 
 if __name__ == "__main__":
