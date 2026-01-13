@@ -148,6 +148,15 @@ def main():
             print(f"  Primary category: {metadata.get('primary_category', 'N/A')}")
             print()
 
+            # Display recommendation
+            if 'recommended_category_for_generation' in metadata:
+                rec = metadata['recommended_category_for_generation']
+                print("RECOMMENDED CATEGORY FOR GENERATION:")
+                print(f"  Category: {rec.get('category_id', 'N/A')}")
+                print(f"  Confidence: {rec.get('confidence', 'unknown')}")
+                print(f"  Reasoning: {rec.get('reasoning', 'N/A')}")
+                print()
+
             # Print each category
             for i, cat in enumerate(analysis['categories'], 1):
                 print(f"Category {i}: {cat.get('category_name', 'Unknown')}")

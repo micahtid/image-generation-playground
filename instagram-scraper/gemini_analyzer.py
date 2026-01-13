@@ -29,6 +29,21 @@ CRITICAL RULES:
 7. Color palettes CAN BE categories themselves (e.g., "Vibrant pink announcements" vs "Muted pastel announcements")
 8. A category CAN have multiple color palettes (e.g., "Nature posts" might use both "Spring greens" and "Autumn oranges")
 
+TREND TYPE CLASSIFICATION:
+Each category must be classified by its PRIMARY trend type. This helps identify what fundamentally defines the category:
+
+- nature-based: Defined by natural elements (outdoor scenes, seasons, landscapes, organic textures)
+- color-based: Defined by specific color palette or color treatment (monochrome, vibrant neons, pastels)
+- layout-based: Defined by spatial arrangement (grid layout, asymmetric design, centered composition)
+- content-based: Defined by subject matter (testimonials, products, events, announcements)
+- style-based: Defined by visual aesthetic (minimalist, bold, editorial, playful, professional)
+- compositional-based: Defined by visual structure (layered collage, single-focus, split-screen)
+- typographic-based: Defined by text treatment (text-only, creative typography, handwritten style)
+- media-based: Defined by media type (photography-heavy, illustration-based, video stills, mixed media)
+
+A category can have PRIMARY + SECONDARY trend types for nuanced classification.
+Example: "Editorial news posts" = PRIMARY: style-based, SECONDARY: media-based + content-based
+
 IMPORTANT: Identify universal elements that are CONSISTENT across ALL 5 posts (100% consistency):
 - Canvas dimensions (do all posts use the same size?)
 - Logo position (does logo appear in the exact same place in every post?)
@@ -42,6 +57,9 @@ OUTPUT JSON:
       "category_id": "unique_snake_case_id",
       "category_name": "Human-readable name combining content + visual style",
       "category_description": "2-3 sentences describing the holistic theme. Focus on what defines this category as a whole.",
+      "trend_type_primary": "style-based",
+      "trend_types_secondary": ["media-based", "content-based"],
+      "trend_type_reasoning": "This category is primarily defined by its bold editorial visual style (style-based), with secondary emphasis on photography usage (media-based) and announcement content (content-based).",
       "post_assignments": [1, 4],
       "purpose": "call_to_action",
       "purpose_correlation": "All CTAs use vibrant gradients" or "Mixed purposes within this style",
@@ -61,8 +79,18 @@ OUTPUT JSON:
       {"hex": "#FF58C1", "name": "vibrant candy pink"},
       {"hex": "#005EB8", "name": "royal blue"}
     ]
+  },
+  "recommended_category": {
+    "category_id": "id_of_recommended_category",
+    "reasoning": "Post 1 (most recent) belongs to this category, indicating current brand direction. Also most frequently used style with 3 of 5 posts."
   }
 }
+
+CATEGORY RECOMMENDATION LOGIC:
+Determine which category is RECOMMENDED for generating new posts:
+1. PRIMARY: The category containing Post 1 (newest/most recent) - this represents the current brand direction
+2. SECONDARY: If Post 1 is an outlier, recommend the category with the most posts
+3. REASONING: Explain why this category is recommended (mention Post 1, frequency, trend alignment)
 
 REMEMBER:
 - Categories should be holistic (content + visual style together)
@@ -259,6 +287,98 @@ The prompt_template is for image generation AI (DALL-E, Midjourney, etc).
         "alignment": "left"
       }}
     }},
+
+## VISUAL TAXONOMY (MANDATORY FOR ALL ELEMENTS)
+
+Every element MUST include a comprehensive `visual` object with relevant properties. Use token-optimized approach:
+- OMIT properties with default values (opacity_percent: 100, has_stroke: false, rotation_degrees: 0, etc.)
+- ONLY include properties relevant to the specific element type
+- Use compact representations where possible
+
+### Core Visual Properties
+
+FILL PROPERTIES (shapes, containers, icons, text):
+- fill_type: "solid" | "outline" | "gradient" | "pattern" | "none"
+- fill_color: Reference to color palette OR descriptive name
+- fill_opacity_percent: 0-100 (omit if 100)
+
+STROKE PROPERTIES (icons, shapes, text outlines):
+- has_stroke: true (only include if element HAS a stroke, omit if false)
+- stroke_color: Color reference
+- stroke_width_px: Pixel value
+- stroke_style: "solid" | "dashed" | "dotted"
+
+CORNER PROPERTIES (rectangular elements):
+- corner_style: "sharp" | "rounded" | "custom"
+- corner_radius_px: Exact pixel value (omit if 0)
+- corner_description: "sharp corners" | "rounded corners 8px" | etc.
+
+SHADOW PROPERTIES:
+- has_shadow: true (only include if element HAS a shadow, omit if false)
+- shadow_offset_x_px, shadow_offset_y_px: Pixel offsets
+- shadow_blur_px: Blur radius in pixels
+- shadow_color: Color with opacity notation (e.g., "soft black 25%")
+
+BORDER PROPERTIES:
+- has_border: true (only include if element HAS a border, omit if false)
+- border_width_px: Pixel value
+- border_style: "solid" | "dashed" | "dotted"
+- border_color: Color reference
+
+ELEMENT-SPECIFIC PROPERTIES:
+- Images: object_fit ("cover" | "contain" | "fill")
+- Containers: background_color
+- Any element: rotation_degrees (omit if 0)
+
+GRADIENT PROPERTIES (only if fill_type = "gradient"):
+- gradient_type: "linear" | "radial"
+- gradient_colors: ["color1", "color2", ...]
+- gradient_direction: "top to bottom" | "left to right" | etc.
+
+PATTERN PROPERTIES (only if fill_type = "pattern"):
+- pattern_type: Description of pattern
+- pattern_opacity_percent: 0-100
+
+### Examples
+
+Simple Text (no stroke, shadow, or border):
+"visual": {{
+  "fill_type": "solid",
+  "fill_color": "pure white"
+}}
+
+Complex Shape (with stroke and shadow):
+"visual": {{
+  "fill_type": "solid",
+  "fill_color": "bright cyan",
+  "has_stroke": true,
+  "stroke_color": "deep navy",
+  "stroke_width_px": 3,
+  "corner_style": "rounded",
+  "corner_radius_px": 12,
+  "has_shadow": true,
+  "shadow_offset_x_px": 0,
+  "shadow_offset_y_px": 4,
+  "shadow_blur_px": 8,
+  "shadow_color": "soft black 20%"
+}}
+
+Image with Mask:
+"visual": {{
+  "object_fit": "cover",
+  "corner_style": "rounded",
+  "corner_radius_px": 16
+}}
+
+### TOKEN OPTIMIZATION RULES
+
+CRITICAL: Balance maximum detail for image generation with minimal token usage:
+1. OMIT fields with default values (opacity_percent: 100, has_stroke: false, rotation_degrees: 0, blend_mode: "normal", etc.)
+2. ONLY include fields relevant to the specific element type (don't add stroke properties to elements without strokes)
+3. Use compact representations: combine related properties (e.g., "shadow_color: 'soft black 20%'" instead of separate opacity field)
+4. Be comprehensive but concise: include every detail needed for recreation, nothing more
+
+Goal: 60-75% token reduction while maintaining 100% specification completeness.
 
     "elements": [
       {{
@@ -555,10 +675,14 @@ Every description must be EXHAUSTIVELY SPECIFIC. An image generator should have 
 - [ ] Position defined (x%, y%, width%, height%)
 - [ ] All four edge relationships specified with exact gaps
 - [ ] Spacing to adjacent elements specified (or "none adjacent")
-- [ ] Corner treatment specified (including "sharp corners")
-- [ ] Shadow specified (including "no shadow")
-- [ ] Border specified (including "no border")
-- [ ] Opacity specified (including "100% fully opaque")
+- [ ] VISUAL TAXONOMY COMPLETE (token-optimized):
+  - [ ] fill_type specified for shapes/containers/text
+  - [ ] stroke properties specified ONLY if has_stroke: true
+  - [ ] corner_style specified (omit radius if sharp/0)
+  - [ ] shadow properties specified ONLY if has_shadow: true
+  - [ ] border properties specified ONLY if has_border: true
+  - [ ] element-specific properties (object_fit for images, background_color for containers)
+  - [ ] gradient/pattern properties ONLY if relevant
 - [ ] Overlap status specified (including "no overlap")
 - [ ] Z-index/layer order specified if relevant
 
@@ -1186,13 +1310,47 @@ def assemble_final_json(category_data, category_analyses, posts):
     from datetime import datetime
 
     primary_category_id = category_data['categories'][0]['category_id'] if category_data['categories'] else None
+    primary_category = category_data['categories'][0] if category_data['categories'] else None
+
+    # Build recommendation reasoning
+    recommendation_reasoning = "No categories detected"
+    recommended_category_id = primary_category_id
+    confidence = "none"
+
+    if primary_category:
+        confidence = "high"
+        trend_types = [primary_category.get('trend_type_primary', '')]
+        if primary_category.get('trend_types_secondary'):
+            trend_types.extend(primary_category.get('trend_types_secondary', []))
+
+        reasoning_parts = [
+            f"Category: {primary_category.get('category_name', 'Unknown')}",
+            f"Trend types: {', '.join([t for t in trend_types if t])}",
+            f"Post 1 (newest) uses this style",
+            f"Purpose: {primary_category.get('purpose', 'unknown')}"
+        ]
+        recommendation_reasoning = ". ".join(reasoning_parts) + "."
+
+    # Check if there's a recommended_category from Phase 1
+    if 'recommended_category' in category_data:
+        rec = category_data['recommended_category']
+        recommended_category_id = rec.get('category_id', primary_category_id)
+        if rec.get('reasoning'):
+            recommendation_reasoning = rec['reasoning']
 
     return {
         "analysis_metadata": {
             "total_posts_analyzed": len(posts),
             "categories_detected": len(category_data['categories']),
             "analysis_timestamp": datetime.now().isoformat(),
-            "primary_category": primary_category_id
+            "primary_category": primary_category_id,
+            "recommended_category_for_generation": {
+                "category_id": recommended_category_id,
+                "confidence": confidence,
+                "reasoning": recommendation_reasoning,
+                "recommendation_source": "most_recent_post",
+                "alternative_selection_method": "Use generation_category_selector for content-based matching"
+            }
         },
         "categories": category_analyses,
         "universal_design_elements": extract_universal_elements(category_data, category_analyses),
@@ -1342,6 +1500,11 @@ Focus your analysis on the design patterns specific to this category.
     analysis_json['purpose'] = category_metadata.get('purpose', 'unknown')
     analysis_json['purpose_correlation'] = category_metadata.get('purpose_correlation', 'Unknown')
     analysis_json['color_palette_notes'] = category_metadata.get('color_palette_notes', 'Unknown')
+
+    # Add trend type classification
+    analysis_json['trend_type_primary'] = category_metadata.get('trend_type_primary', 'unknown')
+    analysis_json['trend_types_secondary'] = category_metadata.get('trend_types_secondary', [])
+    analysis_json['trend_type_reasoning'] = category_metadata.get('trend_type_reasoning', '')
 
     # Add consistency tracking
     logo_consistency = category_metadata.get('logo_consistency', 'Unknown')

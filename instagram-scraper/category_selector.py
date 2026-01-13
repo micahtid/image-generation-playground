@@ -187,16 +187,32 @@ def select_category_for_generation(user_text: str, analysis_json: Dict) -> Dict:
 
     # Apply minimum threshold
     if best_score < 0.3:
-        # Default to primary category if confidence is too low
-        primary_id = analysis_json.get('analysis_metadata', {}).get('primary_category')
-        primary_cat = next((cat for cat in categories if cat.get('category_id') == primary_id), None)
+        # Use recommended category if available, otherwise fall back to primary
+        recommendation = analysis_json.get('analysis_metadata', {}).get('recommended_category_for_generation', {})
+        recommended_id = recommendation.get('category_id')
 
-        return {
-            "selected_category_id": primary_id,
-            "confidence_score": best_score,
-            "reasoning": f"Low confidence match (score: {best_score:.2f}). Defaulting to primary category (most recent post)",
-            "category_data": primary_cat
-        }
+        if recommended_id:
+            recommended_cat = next((cat for cat in categories if cat.get('category_id') == recommended_id), None)
+
+            return {
+                "selected_category_id": recommended_id,
+                "confidence_score": best_score,
+                "reasoning": f"Low confidence match (score: {best_score:.2f}). Using recommended: {recommendation.get('reasoning', 'Most recent post style')}",
+                "category_data": recommended_cat,
+                "selection_method": "fallback_to_recommendation"
+            }
+        else:
+            # Fallback to primary category if no recommendation
+            primary_id = analysis_json.get('analysis_metadata', {}).get('primary_category')
+            primary_cat = next((cat for cat in categories if cat.get('category_id') == primary_id), None)
+
+            return {
+                "selected_category_id": primary_id,
+                "confidence_score": best_score,
+                "reasoning": f"Low confidence match (score: {best_score:.2f}). Defaulting to primary category (most recent post)",
+                "category_data": primary_cat,
+                "selection_method": "fallback_to_primary"
+            }
 
     # Find the category data
     selected_cat = next((cat for cat in categories if cat.get('category_id') == best_id), None)
