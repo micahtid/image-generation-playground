@@ -67,11 +67,15 @@ def scrape_instagram_posts():
         raise Exception(f"Failed to fetch dataset: {dataset_response.text}")
 
     posts = dataset_response.json()
-    print(f"Retrieved {len(posts)} posts")
+    print(f"Retrieved {len(posts)} posts from Apify")
+
+    # Filter out pinned posts - we only want the most recent posts chronologically
+    non_pinned_posts = [post for post in posts if not post.get('isPinned', False)]
+    print(f"Filtered to {len(non_pinned_posts)} non-pinned posts (excluded {len(posts) - len(non_pinned_posts)} pinned posts)")
 
     # Process and limit images per post
     processed_posts = []
-    for post in posts:
+    for post in non_pinned_posts:
         # Limit images to MAX_IMAGES_PER_POST
         if 'images' in post and isinstance(post['images'], list):
             post['images'] = post['images'][:MAX_IMAGES_PER_POST]

@@ -17,10 +17,14 @@ def clear_output_directory():
 
 
 def clear_design_analysis_only():
-    """Clear only design_analysis files, keep raw_posts."""
+    """Clear only design_analysis files (including main.json and category files), keep raw_posts."""
     if OUTPUT_DIR.exists():
         for file in OUTPUT_DIR.iterdir():
-            if file.is_file() and file.name.startswith("design_analysis_"):
+            if file.is_file() and (
+                file.name.startswith("design_analysis_") or
+                file.name == "main.json" or
+                file.name.startswith("category_")
+            ):
                 file.unlink()
         print("Cleared previous design analysis files")
 
@@ -109,20 +113,32 @@ def main():
     print("STEP 2: Analyzing design patterns with category detection...")
     print("-" * 60)
     try:
-        analysis = analyze_posts_with_categories(posts)
+        from config import INSTAGRAM_PROFILE
+        main_json, category_jsons = analyze_posts_with_categories(posts, INSTAGRAM_PROFILE)
         print("Two-phase analysis complete")
     except Exception as e:
         print(f"Error analyzing posts: {e}")
         return
 
-    # Step 3: Save analysis
+    # Step 3: Save analysis results (split into main + category files)
     print()
     print("STEP 3: Saving analysis results...")
     print("-" * 60)
-    analysis_file = OUTPUT_DIR / f"design_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    with open(analysis_file, 'w', encoding='utf-8') as f:
-        json.dump(analysis, f, indent=2, ensure_ascii=False)
-    print(f"Design analysis saved to: {analysis_file}")
+
+    # Save main JSON
+    main_file = OUTPUT_DIR / "main.json"
+    with open(main_file, 'w', encoding='utf-8') as f:
+        json.dump(main_json, f, indent=2, ensure_ascii=False)
+    print(f"Main design system saved to: {main_file}")
+
+    # Save each category JSON
+    category_files = []
+    for category_id, category_json in category_jsons.items():
+        category_file = OUTPUT_DIR / f"category_{category_id}.json"
+        with open(category_file, 'w', encoding='utf-8') as f:
+            json.dump(category_json, f, indent=2, ensure_ascii=False)
+        category_files.append(category_file)
+        print(f"Category '{category_id}' saved to: {category_file}")
 
     # Print summary
     print()
@@ -134,82 +150,71 @@ def main():
         print(f"Raw data: {raw_posts_file}")
     else:
         print("Raw data: (reused existing)")
-    print(f"Analysis: {analysis_file}")
+    print(f"Main design system: {main_file}")
+    print(f"Category files: {len(category_files)} files")
+    for cf in category_files:
+        print(f"  - {cf.name}")
     print()
 
     # Print a preview of the analysis
-    if isinstance(analysis, dict):
-        # Check for new categorized structure
-        if 'categories' in analysis and 'analysis_metadata' in analysis:
-            metadata = analysis['analysis_metadata']
-            print("Category Analysis Summary:")
-            print("-" * 60)
-            print(f"  Categories detected: {metadata.get('categories_detected', 0)}")
-            print(f"  Primary category: {metadata.get('primary_category', 'N/A')}")
-            print()
+    print("Category Analysis Summary:")
+    print("-" * 60)
+    print(f"  Organization: {main_json.get('organization_name', 'N/A')}")
+    print(f"  Categories detected: {len(category_jsons)}")
+    print()
 
-            # Display recommendation
-            if 'recommended_category_for_generation' in metadata:
-                rec = metadata['recommended_category_for_generation']
-                print("RECOMMENDED CATEGORY FOR GENERATION:")
-                print(f"  Category: {rec.get('category_id', 'N/A')}")
-                print(f"  Confidence: {rec.get('confidence', 'unknown')}")
-                print(f"  Reasoning: {rec.get('reasoning', 'N/A')}")
-                print()
+    # Print each category
+    for i, (category_id, cat_json) in enumerate(category_jsons.items(), 1):
+        cat_info = cat_json.get('category_info', {})
+        print(f"Category {i}: {cat_info.get('category_name', 'Unknown')}")
+        print(f"  ID: {category_id}")
+        print(f"  Posts: {cat_info.get('post_count', 0)} ({', '.join(map(str, cat_info.get('posts_included', [])))})")
 
-            # Print each category
-            for i, cat in enumerate(analysis['categories'], 1):
-                print(f"Category {i}: {cat.get('category_name', 'Unknown')}")
-                print(f"  Posts: {cat.get('post_count', 0)} ({', '.join(map(str, cat.get('posts_included', [])))})")
-                print(f"  Purpose: {cat.get('purpose', 'Unknown')}")
+        purpose_analysis = cat_json.get('purpose_analysis', {})
+        print(f"  Purpose: {purpose_analysis.get('purpose', 'Unknown')}")
 
-                # Print logo consistency if available
-                if 'consistency_tracking' in cat:
-                    logo_info = cat['consistency_tracking'].get('logo_placement', {})
-                    print(f"  Logo: {logo_info.get('consistency_score', 'Unknown')}")
+        # Print logo consistency if available
+        if 'consistency_tracking' in cat_json:
+            logo_info = cat_json['consistency_tracking'].get('logo_placement', {})
+            print(f"  Logo: {logo_info.get('consistency_score', 'Unknown')}")
 
-                # Print design system canvas info if available
-                if 'design_system' in cat and 'canvas' in cat['design_system']:
-                    canvas = cat['design_system']['canvas']
-                    print(f"  Canvas: {canvas.get('width', '?')}x{canvas.get('height', '?')}")
+        # Print design system canvas info if available
+        if 'design_system' in cat_json and 'canvas' in cat_json['design_system']:
+            canvas = cat_json['design_system']['canvas']
+            print(f"  Canvas: {canvas.get('width', '?')}x{canvas.get('height', '?')}")
 
-                print()
+        print()
 
-            # Print universal elements if available
-            if 'universal_design_elements' in analysis:
-                universal = analysis['universal_design_elements']
-                print("Universal Elements (across all posts):")
-                print("-" * 60)
+    # Print universal elements if available
+    has_universal = False
+    print("Universal Elements (shared across all categories):")
+    print("-" * 60)
 
-                if 'canvas' in universal and universal['canvas'].get('consistent'):
-                    canvas = universal['canvas']
-                    print(f"  Canvas: {canvas.get('width', 0)}x{canvas.get('height', 0)} (CONSISTENT)")
+    if 'canvas' in main_json:
+        canvas = main_json['canvas']
+        print(f"  Canvas: {canvas.get('width', 0)}x{canvas.get('height', 0)}")
+        has_universal = True
 
-                if 'fonts' in universal and universal['fonts'].get('consistent'):
-                    fonts = universal['fonts'].get('universal_fonts', [])
-                    print(f"  Fonts: {', '.join(fonts)} (CONSISTENT)")
+    if 'fonts' in main_json:
+        fonts = main_json['fonts']
+        print(f"  Fonts: {', '.join(fonts)}")
+        has_universal = True
 
-                if 'logo' in universal and universal['logo'].get('consistent_position'):
-                    logo_pos = universal['logo'].get('universal_position', 'unknown')
-                    print(f"  Logo: Always {logo_pos} (CONSISTENT)")
+    if 'logo_position' in main_json:
+        print(f"  Logo: Always {main_json['logo_position']}")
+        has_universal = True
 
-                print()
-        # Fallback for old structure (backward compatibility)
-        elif 'design_system' in analysis:
-            ds = analysis['design_system']
-            print("Design System Summary:")
-            print("-" * 60)
-            if 'canvas' in ds:
-                print(f"  Canvas: {ds['canvas'].get('width', '?')}x{ds['canvas'].get('height', '?')} ({ds['canvas'].get('aspect_ratio', '?')})")
-            if 'colors' in ds:
-                colors = ds['colors']
-                print(f"  Colors:")
-                for name, color in list(colors.items())[:3]:  # Limit to first 3 colors
-                    if isinstance(color, dict):
-                        print(f"    {name}: {color.get('name', '?')} ({color.get('hex', '?')})")
-            if 'typography' in ds and 'headline' in ds['typography']:
-                print(f"  Headline Font: {ds['typography']['headline'].get('font_family', '?')}")
-            print()
+    if 'brand_colors' in main_json:
+        colors = main_json['brand_colors']
+        print(f"  Brand Colors: {len(colors)} colors")
+        for color in colors[:3]:  # Show first 3
+            print(f"    - {color.get('name', 'Unknown')} ({color.get('hex', 'N/A')})")
+        has_universal = True
+
+    if not has_universal:
+        print("  No consistent universal elements detected")
+
+    print()
 
     print()
     print("All done!")

@@ -1302,10 +1302,12 @@ def build_category_selector(category_data):
     }
 
 
-def assemble_final_json(category_data, category_analyses, posts):
+def assemble_final_json(category_data, category_analyses, posts, instagram_profile):
     """
     Combine Phase 1 + Phase 2 results.
-    Add analysis_metadata, universal_design_elements, cross_category_patterns, generation_category_selector.
+    Returns a tuple: (main_json, category_jsons_dict)
+    - main_json: Contains organization info, metadata, universal elements, cross-category patterns
+    - category_jsons_dict: {category_id: category_json} for each category
     """
     from datetime import datetime
 
@@ -1338,25 +1340,70 @@ def assemble_final_json(category_data, category_analyses, posts):
         if rec.get('reasoning'):
             recommendation_reasoning = rec['reasoning']
 
-    return {
-        "analysis_metadata": {
-            "total_posts_analyzed": len(posts),
-            "categories_detected": len(category_data['categories']),
-            "analysis_timestamp": datetime.now().isoformat(),
-            "primary_category": primary_category_id,
-            "recommended_category_for_generation": {
-                "category_id": recommended_category_id,
-                "confidence": confidence,
-                "reasoning": recommendation_reasoning,
-                "recommendation_source": "most_recent_post",
-                "alternative_selection_method": "Use generation_category_selector for content-based matching"
-            }
-        },
-        "categories": category_analyses,
-        "universal_design_elements": extract_universal_elements(category_data, category_analyses),
-        "cross_category_patterns": infer_cross_category_patterns(category_analyses),
-        "generation_category_selector": build_category_selector(category_data)
+    # Extract organization name from Instagram profile URL
+    org_name = instagram_profile.rstrip('/').split('/')[-1].replace('_', ' ').title()
+
+    # Build minimal main JSON with only essential generation info
+    universal_elements = extract_universal_elements(category_data, category_analyses)
+
+    main_json = {
+        "organization_name": org_name
     }
+
+    # Only include universal elements that are actually consistent and useful for generation
+    if universal_elements.get('canvas', {}).get('width'):
+        main_json['canvas'] = {
+            "width": universal_elements['canvas']['width'],
+            "height": universal_elements['canvas']['height'],
+            "aspect_ratio": universal_elements['canvas']['aspect_ratio']
+        }
+
+    if universal_elements.get('fonts', {}).get('consistent') and universal_elements['fonts'].get('universal_fonts'):
+        main_json['fonts'] = universal_elements['fonts']['universal_fonts']
+
+    if universal_elements.get('logo', {}).get('consistent_position'):
+        main_json['logo_position'] = universal_elements['logo']['universal_position']
+
+    if universal_elements.get('brand_colors', {}).get('core_colors'):
+        main_json['brand_colors'] = universal_elements['brand_colors']['core_colors']
+
+    # Build category JSONs - one for each category
+    category_jsons = {}
+    for cat_analysis in category_analyses:
+        category_id = cat_analysis.get('category_id', 'unknown')
+
+        # Build category JSON with all design system details
+        category_json = {
+            "category_info": {
+                "category_id": category_id,
+                "category_name": cat_analysis.get('category_name', 'Unknown'),
+                "category_description": cat_analysis.get('category_description', ''),
+                "posts_included": cat_analysis.get('posts_included', []),
+                "post_count": cat_analysis.get('post_count', 0)
+            },
+            "trend_classification": {
+                "trend_type_primary": cat_analysis.get('trend_type_primary', 'unknown'),
+                "trend_types_secondary": cat_analysis.get('trend_types_secondary', []),
+                "trend_type_reasoning": cat_analysis.get('trend_type_reasoning', '')
+            },
+            "purpose_analysis": {
+                "purpose": cat_analysis.get('purpose', 'unknown'),
+                "purpose_correlation": cat_analysis.get('purpose_correlation', ''),
+                "color_palette_notes": cat_analysis.get('color_palette_notes', '')
+            },
+            "consistency_tracking": cat_analysis.get('consistency_tracking', {}),
+            "design_system": cat_analysis.get('design_system', {}),
+            "brand_style": cat_analysis.get('brand_style', {}),
+            "prompt_template": cat_analysis.get('prompt_template', ''),
+            "generation_instructions": cat_analysis.get('generation_instructions', {}),
+            "image_sequence": cat_analysis.get('image_sequence', {}),
+            "asset_recreation": cat_analysis.get('asset_recreation', {}),
+            "placeholder_guidance": cat_analysis.get('placeholder_guidance', {})
+        }
+
+        category_jsons[category_id] = category_json
+
+    return main_json, category_jsons
 
 
 def analyze_category_with_gemini(posts, category_metadata):
@@ -1533,12 +1580,19 @@ Focus your analysis on the design patterns specific to this category.
     return analysis_json
 
 
-def analyze_posts_with_categories(posts):
+def analyze_posts_with_categories(posts, instagram_profile):
     """
     Full two-phase analysis with category detection and per-category analysis.
     1. Detect categories (Phase 1)
     2. Analyze each category in parallel (Phase 2)
-    3. Assemble final JSON structure
+    3. Assemble final JSON structure (split into main + category JSONs)
+
+    Args:
+        posts: List of Instagram posts to analyze
+        instagram_profile: Instagram profile URL (e.g., "https://www.instagram.com/username/")
+
+    Returns:
+        Tuple of (main_json, category_jsons_dict)
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -1557,29 +1611,49 @@ def analyze_posts_with_categories(posts):
         print("Warning: No categories detected, falling back to single analysis")
         # Fallback: analyze all posts as one category
         analysis = analyze_posts_with_gemini(posts)
-        return {
-            "analysis_metadata": {
-                "total_posts_analyzed": len(posts),
-                "categories_detected": 1,
-                "analysis_timestamp": datetime.now().isoformat(),
-                "primary_category": "fallback_single_category",
-                "note": "Category detection failed, using fallback single analysis"
-            },
-            "categories": [
-                {
-                    "category_id": "fallback_single_category",
-                    "category_name": "All Posts",
-                    "category_description": "All posts analyzed as single category (fallback)",
-                    "posts_included": list(range(1, len(posts) + 1)),
-                    "post_count": len(posts),
-                    "purpose": "mixed",
-                    **analysis
-                }
-            ],
-            "universal_design_elements": extract_universal_elements(category_data, [analysis]),
-            "cross_category_patterns": {},
-            "generation_category_selector": {"available_categories": ["fallback_single_category"], "selection_logic": {}}
+
+        # Build fallback main JSON and category JSON (minimal structure)
+        org_name = instagram_profile.rstrip('/').split('/')[-1].replace('_', ' ').title()
+        universal_elements = extract_universal_elements(category_data, [analysis])
+
+        main_json = {
+            "organization_name": org_name
         }
+
+        # Only include universal elements that are actually consistent
+        if universal_elements.get('canvas', {}).get('width'):
+            main_json['canvas'] = {
+                "width": universal_elements['canvas']['width'],
+                "height": universal_elements['canvas']['height'],
+                "aspect_ratio": universal_elements['canvas']['aspect_ratio']
+            }
+
+        if universal_elements.get('fonts', {}).get('consistent') and universal_elements['fonts'].get('universal_fonts'):
+            main_json['fonts'] = universal_elements['fonts']['universal_fonts']
+
+        if universal_elements.get('logo', {}).get('consistent_position'):
+            main_json['logo_position'] = universal_elements['logo']['universal_position']
+
+        if universal_elements.get('brand_colors', {}).get('core_colors'):
+            main_json['brand_colors'] = universal_elements['brand_colors']['core_colors']
+
+        category_json = {
+            "category_info": {
+                "category_id": "fallback_single_category",
+                "category_name": "All Posts",
+                "category_description": "All posts analyzed as single category (fallback)",
+                "posts_included": list(range(1, len(posts) + 1)),
+                "post_count": len(posts)
+            },
+            "purpose_analysis": {
+                "purpose": "mixed",
+                "purpose_correlation": "N/A",
+                "color_palette_notes": "N/A"
+            },
+            **{k: v for k, v in analysis.items() if k not in ['category_id', 'category_name', 'category_description', 'posts_included', 'post_count']}
+        }
+
+        return main_json, {"fallback_single_category": category_json}
 
     num_categories = len(category_data['categories'])
     print(f"\nDetected {num_categories} categories:")
@@ -1631,7 +1705,7 @@ def analyze_posts_with_categories(posts):
     print("PHASE 3: ASSEMBLING FINAL RESULTS")
     print("=" * 60)
 
-    final_result = assemble_final_json(category_data, category_analyses, posts)
+    main_json, category_jsons = assemble_final_json(category_data, category_analyses, posts, instagram_profile)
 
     print("[OK] Assembly complete!")
     print()
@@ -1639,7 +1713,7 @@ def analyze_posts_with_categories(posts):
     print("TWO-PHASE ANALYSIS COMPLETE")
     print("=" * 60)
 
-    return final_result
+    return main_json, category_jsons
 
 
 if __name__ == "__main__":
