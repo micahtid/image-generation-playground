@@ -1,20 +1,27 @@
+"""
+Instagram scraping service using Apify API.
+"""
 import time
-
 import requests
 
-from config import APIFY_API_KEY, APIFY_ACTOR_ID, INSTAGRAM_PROFILE, MAX_POSTS, MAX_IMAGES_PER_POST
+from config import APIFY_API_KEY, APIFY_ACTOR_ID, MAX_POSTS, MAX_IMAGES_PER_POST
 
 
-def scrape_instagram_posts():
+def scrape_instagram_posts(username):
     """
-    Scrape Instagram posts using Apify API.
-    Returns a list of posts with limited images.
+    Scrape Instagram posts for a given username using Apify API.
+    
+    Args:
+        username: Instagram username (without @ or URL)
+    
+    Returns:
+        List of posts with limited images per post
     """
-
+    profile_url = f"https://www.instagram.com/{username}/"
+    
     # Prepare the input for Apify actor
-    # Note: Optional fields should be omitted entirely, not set to None
     actor_input = {
-        "directUrls": [INSTAGRAM_PROFILE],
+        "directUrls": [profile_url],
         "resultsType": "posts",  # Only posts, no Reels
         "resultsLimit": MAX_POSTS,
         "addParentData": False
@@ -29,7 +36,7 @@ def scrape_instagram_posts():
         "token": APIFY_API_KEY
     }
 
-    print(f"Starting Apify actor to scrape {INSTAGRAM_PROFILE}...")
+    print(f"Starting Apify actor to scrape @{username}...")
     response = requests.post(run_url, json=actor_input, headers=headers, params=params)
 
     if response.status_code != 201:
@@ -40,7 +47,6 @@ def scrape_instagram_posts():
     default_dataset_id = run_data["data"]["defaultDatasetId"]
 
     print(f"Actor run started with ID: {run_id}")
-    print("Waiting for actor to finish...")
 
     # Wait for the actor to finish
     status_url = f"https://api.apify.com/v2/acts/{APIFY_ACTOR_ID}/runs/{run_id}"
@@ -76,20 +82,10 @@ def scrape_instagram_posts():
         if 'images' in post and isinstance(post['images'], list):
             post['images'] = post['images'][:MAX_IMAGES_PER_POST]
 
-        # Also check for displayUrl and childPosts (carousel posts)
+        # Also check for childPosts (carousel posts)
         if 'childPosts' in post and isinstance(post['childPosts'], list):
             post['childPosts'] = post['childPosts'][:MAX_IMAGES_PER_POST]
 
         processed_posts.append(post)
 
     return processed_posts
-
-
-if __name__ == "__main__":
-    posts = scrape_instagram_posts()
-    print(f"\nScraped {len(posts)} posts successfully!")
-    for i, post in enumerate(posts, 1):
-        print(f"\nPost {i}:")
-        print(f"  URL: {post.get('url', 'N/A')}")
-        print(f"  Caption: {post.get('caption', 'N/A')[:100]}...")
-        print(f"  Images: {len(post.get('images', []))}")

@@ -1,0 +1,118 @@
+{
+  "analysis_metadata": {
+    "total_posts_analyzed": 5,
+    "categories_detected": 3,
+    "analysis_timestamp": "2026-01-17T19:56:21.056794",
+    "primary_category": "editorial_news_spotlight",
+    "recommended_category_for_generation": {
+      "category_id": "editorial_news_spotlight",
+      "confidence": "high",
+      "reasoning": "Post 1 belongs to the 'Editorial News Spotlight' category, reflecting a current strategy of highlighting media coverage. The content is about the brand and encourages users to read the linked article.",
+      "recommendation_source": "most_recent_post",
+      "alternative_selection_method": "Use generation_category_selector for content-based matching"
+    }
+  },
+  "universal_design_elements": {
+    "description": "Design elements that are CONSISTENT across ALL posts, regardless of category",
+    "canvas": {
+      "width": 1080,
+      "height": 1350,
+      "aspect_ratio": "4:5",
+      "note": "All posts use the same canvas dimensions"
+    },
+    "fonts": {
+      "consistent": true,
+      "universal_fonts": [
+        "League Spartan",
+        "Dancing Script",
+        "Montserrat"
+      ],
+      "note": "These fonts appear across all categories"
+    },
+    "logo": {
+      "consistent_position": true,
+      "universal_position": "top-right",
+      "consistency_score": "ALWAYS (100%)",
+      "note": "Logo always appears in top-right across all posts"
+    },
+    "brand_colors": {
+      "core_colors": [
+        {
+          "hex": "#FF58C1",
+          "name": "vibrant candy pink"
+        },
+        {
+          "hex": "#005EB8",
+          "name": "royal blue"
+        }
+      ],
+      "note": "These brand colors appear in every post, though usage varies by category"
+    },
+    "other_universal_elements": [],
+    "note": "When generating new posts, ALWAYS include these universal elements unless specifically instructed otherwise"
+  },
+  "cross_category_patterns": {
+    "global_logo_consistency": "CONSISTENT - logo always top-right across all posts",
+    "font_consistency": "CONSISTENT - Bebas Neue, Dancing Script, League Spartan, Montserrat, Roboto, sans-serif used across all categories",
+    "color_palette_strategy": "Category-specific palettes using universal brand colors",
+    "carousel_usage": "Royal Blue Celebratory Posts: single image, Candy Pink Open Call: single image, Editorial News Spotlight: single image",
+    "canvas_consistency": "CONSISTENT - All posts use same dimensions"
+  },
+  "generation_category_selector": {
+    "available_categories": [
+      "editorial_news_spotlight",
+      "royal_blue_celebratory",
+      "candy_pink_open_call"
+    ],
+    "selection_logic": {
+      "editorial_news_spotlight": {
+        "keywords": [
+          "deadline",
+          "save the date",
+          "editorial",
+          "spotlight",
+          "news",
+          "announcement",
+          "upcoming",
+          "new",
+          "reminder",
+          "launching"
+        ],
+        "content_indicators": [],
+        "purpose": "announcement"
+      },
+      "royal_blue_celebratory": {
+        "keywords": [
+          "deadline",
+          "save the date",
+          "blue",
+          "celebratory",
+          "posts",
+          "announcement",
+          "royal",
+          "upcoming",
+          "new",
+          "reminder",
+          "launching"
+        ],
+        "content_indicators": [],
+        "purpose": "announcement"
+      },
+      "candy_pink_open_call": {
+        "keywords": [
+          "open",
+          "call",
+          "candy",
+          "pink"
+        ],
+        "content_indicators": [],
+        "purpose": "call to action"
+      }
+    }
+  },
+  "available_categories": [
+    "royal_blue_celebratory",
+    "candy_pink_open_call",
+    "editorial_news_spotlight"
+  ]
+}

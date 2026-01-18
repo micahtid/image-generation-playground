@@ -4,11 +4,21 @@ import re
 import time
 from datetime import datetime
 from io import BytesIO
+from typing import Dict, List
 
 import requests
 from PIL import Image
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path so we can import config
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from config import OPENROUTER_API_KEY, OPENROUTER_API_URL, OPENROUTER_MODEL, MAX_IMAGES_PER_POST
+
+# Debug: verify config loaded correctly
+print(f"[Analyzer] API Key loaded: {'Yes' if OPENROUTER_API_KEY else 'No'}")
+print(f"[Analyzer] Model: {OPENROUTER_MODEL}")
 
 
 CATEGORY_DETECTION_PROMPT = """
@@ -918,7 +928,10 @@ def analyze_posts_with_gemini(posts):
                 raise Exception(f"API connection failed after {max_retries} attempts: {e}")
 
     if response is None or response.status_code != 200:
-        error_msg = response.text if response else "No response"
+        if response:
+            print(f"[DEBUG] API returned status: {response.status_code}")
+            print(f"[DEBUG] Response body: {response.text[:500]}")
+        error_msg = response.text if response else "No response received (response is None)"
         raise Exception(f"OpenRouter API error: {error_msg}")
 
     response_data = response.json()

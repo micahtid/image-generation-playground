@@ -1,0 +1,313 @@
+{
+  "design_system": {
+    "canvas": {
+      "width": 1080,
+      "height": 1350,
+      "aspect_ratio": "4:5"
+    },
+    "colors": {
+      "primary": {
+        "hex": "#0077cc",
+        "name": "vibrant royal blue"
+      },
+      "secondary": {
+        "hex": "#ffffff",
+        "name": "pure white"
+      },
+      "accent": {
+        "hex": "#000000",
+        "name": "black"
+      },
+      "background": {
+        "hex": "#ffffff",
+        "name": "pure white"
+      },
+      "text": {
+        "hex": "#000000",
+        "name": "black"
+      }
+    },
+    "typography": {
+      "headline": {
+        "font_family": "Arial",
+        "font_weight": 700,
+        "size_percent": 7,
+        "color": "text",
+        "transform": "none",
+        "alignment": "left",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "subheadline": {
+        "font_family": "Arial",
+        "font_weight": 400,
+        "size_percent": 4,
+        "color": "text",
+        "transform": "none",
+        "alignment": "left",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "body": {
+        "font_family": "Arial",
+        "font_weight": 400,
+        "size_percent": 3,
+        "color": "text",
+        "alignment": "left"
+      }
+    },
+    "elements": [
+      {
+        "name": "NewsEditorialScreenshot",
+        "type": "image",
+        "description": "Screenshot of the news article",
+        "position": {
+          "x_percent": 5,
+          "y_percent": 10,
+          "width_percent": 90,
+          "height_percent": 75,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 10,
+          "gap_to_bottom": null,
+          "gap_to_left": 5,
+          "gap_to_right": 5
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": "SummaryText",
+          "gap_below": 3,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "corner_style": "sharp",
+          "corner_description": "sharp corners",
+          "object_fit": "cover"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Main content of the post"
+      },
+      {
+        "name": "SummaryText",
+        "type": "text",
+        "description": "Short summary of the article",
+        "position": {
+          "x_percent": 5,
+          "y_percent": 90,
+          "width_percent": 90,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 5,
+          "gap_to_right": 5
+        },
+        "spacing": {
+          "element_above": "NewsEditorialScreenshot",
+          "gap_above": 3,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "black"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Appears at the bottom of the image"
+      }
+    ],
+    "element_groups": [],
+    "background": {
+      "type": "solid",
+      "base_color": "background",
+      "pattern": {
+        "type": "none",
+        "description": "no background pattern",
+        "opacity_percent": 0
+      },
+      "overlay": {
+        "enabled": false,
+        "color": null,
+        "opacity_percent": 0
+      }
+    },
+    "logo": {
+      "position": "top-right",
+      "x_percent": 95,
+      "y_percent": 5,
+      "size_percent": 8,
+      "style": "black text wordmark"
+    },
+    "decorative_elements": [],
+    "global_defaults": {
+      "minimum_margin": 2,
+      "default_corner_radius": 0,
+      "default_shadow": "none",
+      "default_border": "none",
+      "notes": "Defaults that apply unless overridden in individual elements"
+    }
+  },
+  "brand_style": {
+    "mood": "Clean, professional, informative",
+    "keywords": [
+      "news",
+      "editorial",
+      "modern",
+      "youthful"
+    ],
+    "avoid": [
+      "playful",
+      "loud",
+      "busy"
+    ]
+  },
+  "prompt_template": "Create an Instagram post in a news editorial style. The main element is a screenshot of a news article, taking up most of the space, with the top of the article aligned to the top. The screenshot fills 90% of the width, centered horizontally, with a 5% margin from both the left and right edges and is placed 10% below the top edge. Below the screenshot, a short text summary in black color summarizing the article fills 90% of the width and the black text is aligned on the left. The overall background is pure white. A placeholder logo in black text is in the top right corner, 5% from the top and right edges.",
+  "generation_instructions": {
+    "required": [
+      "Screenshot of a news article",
+      "Text summary",
+      "Logo"
+    ],
+    "forbidden": [
+      "DO NOT render hex color codes (like #FF58C1) as visible text",
+      "DO NOT render design metrics (font sizes, percentages, coordinates) as visible text",
+      "DO NOT render degree symbols or rotation values as visible text",
+      "NOTE: Content numbers ARE allowed (e.g., '10 volunteers', 'Chapter 5', '2024')",
+      "NOTE: Only DESIGN SPECIFICATION values should be hidden, not content"
+    ],
+    "notes": "Technical values in design_system are for programmatic reference. The prompt_template uses descriptive names for image generation."
+  },
+  "image_sequence": {
+    "is_carousel": false,
+    "total_slides": 1,
+    "thumbnail_style": {
+      "description": "Single image post. Represents a news artile screengrab",
+      "unique_elements": [],
+      "text_approach": "Short catchy summary",
+      "visual_intensity": "Consistent"
+    },
+    "content_slide_style": {
+      "description": "N/A",
+      "template": "N/A",
+      "text_approach": "N/A",
+      "visual_intensity": "N/A"
+    },
+    "slide_variations": [],
+    "consistent_elements": [],
+    "changing_elements": []
+  },
+  "asset_recreation": {
+    "photographs": [
+      {
+        "element_name": "hero_image",
+        "subject": "Screenshot of a news article featuring the organization's founders or activities",
+        "style": "Direct capture of a webpage element",
+        "lighting": "As captured from the source",
+        "color_grading": "As captured from the source",
+        "framing": "Full view of the article headline and a portion of the content",
+        "mask_shape": "Rectangular crop"
+      }
+    ],
+    "icons": [],
+    "decorative_elements": [],
+    "logo_placeholder": {
+      "text": "[BRAND]",
+      "style": "Bold sans-serif wordmark",
+      "color": "Black on white background",
+      "position": "Top-right corner with comfortable margin"
+    }
+  },
+  "placeholder_guidance": {
+    "headlines": {
+      "voice": "Informative, news-oriented, concise",
+      "length": "3-7 words",
+      "examples": [
+        "Founders Featured in Local News",
+        "Organization Makes Headlines",
+        "Impactful Work Recognized by Media"
+      ],
+      "avoid": [
+        "Clickbait",
+        "Exaggeration"
+      ]
+    },
+    "statistics": {
+      "format": "Use full numbers with appropriate units",
+      "realistic_ranges": {
+        "mentions": "1-10",
+        "viewership": "1000-100000"
+      },
+      "display_style": "Small descriptor followed by number"
+    },
+    "supporting_imagery": {
+      "on_brand_subjects": [
+        "Screenshot of article",
+        "Founders featured in news segment",
+        "Organization logo alongside news outlet logo"
+      ],
+      "style_notes": "Authenticity and legitimacy"
+    },
+    "dates_and_events": {
+      "date_format": "MONTH DD, YYYY",
+      "event_types": [],
+      "time_format": null
+    }
+  },
+  "category_id": "founder_feature_news_editorial",
+  "category_name": "Founder Feature in News Editorial Style",
+  "category_description": "This category highlights news features of the founders, using screenshots or photos from the news outlets. It presents content in an editorial style featuring the news source logo and layout within the post.",
+  "posts_included": [
+    1,
+    4
+  ],
+  "post_count": 2,
+  "purpose": "announcement",
+  "purpose_correlation": "All announcements use this editorial style",
+  "color_palette_notes": "Uses color palettes derived from the news source featured. Predominantly cool blues and whites.",
+  "trend_type_primary": "style-based",
+  "trend_types_secondary": [
+    "content-based",
+    "media-based"
+  ],
+  "trend_type_reasoning": "The primary focus of this category is its editorial presentation style (style-based), with secondary emphasis on highlighting founder's features (content-based) and incorporating news outlet visuals (media-based).",
+  "consistency_tracking": {
+    "logo_placement": {
+      "primary_position": "top-right",
+      "consistency_score": "VARIABLE",
+      "variations": [
+        {
+          "note": "Logo position varies within this category"
+        }
+      ]
+    },
+    "color_scheme": {
+      "consistent": true,
+      "palette_variations": []
+    }
+  }
+}

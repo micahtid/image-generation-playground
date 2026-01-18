@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Editor</title>
+    <title>Generate - @{{ handle }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --font: 'Roboto Mono', monospace;
@@ -19,6 +21,7 @@
             --surface: #ffffff;
             --surface-quiet: #f7f7f7;
             --danger: #b00020;
+            --accent: #6366f1;
         }
 
         * {
@@ -41,6 +44,7 @@
             border: 1px solid var(--border);
         }
 
+        /* Left Panel - Image Canvas */
         .left-panel {
             flex: 1;
             display: flex;
@@ -88,70 +92,51 @@
             z-index: 10;
         }
 
-        .placeholder {
+        .no-image {
+            text-align: center;
             color: var(--muted);
-            font-size: 14px;
+            font-size: 12px;
         }
 
+        /* Right Panel - Controls */
         .right-panel {
             width: 400px;
             display: flex;
             flex-direction: column;
             background: var(--surface);
+            border-right: 1px solid var(--border);
         }
 
         .header {
-            padding: 15px;
+            padding: 12px 15px;
             border-bottom: 1px solid var(--border);
             background: var(--surface);
-            color: var(--text);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .header h1 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 400;
             letter-spacing: 1px;
         }
 
-        .history-nav {
-            display: flex;
-            gap: 8px;
+        .back-link {
+            font-size: 11px;
+            color: var(--muted);
+            text-decoration: none;
         }
 
-        .history-nav-btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
+        .back-link:hover {
             color: var(--text);
-            padding: 6px 12px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.1s, color 0.1s;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .history-nav-btn:hover:not(:disabled) {
-            background: var(--text);
-            color: var(--surface);
-        }
-
-        .history-nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
         }
 
         .controls {
             padding: 12px 15px;
             border-bottom: 1px solid var(--border);
-            background: var(--surface);
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 8px;
         }
 
@@ -170,11 +155,33 @@
             color: var(--surface);
         }
 
-        .control-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        /* Analysis Selector */
+        .analysis-selector {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-quiet);
         }
 
+        .analysis-selector label {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .analysis-selector select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        /* History Panel */
         .history {
             flex: 1;
             overflow-y: auto;
@@ -196,7 +203,6 @@
             margin-bottom: 6px;
             text-transform: uppercase;
             font-size: 10px;
-            color: var(--text);
             letter-spacing: 0.5px;
         }
 
@@ -211,25 +217,44 @@
             font-size: 11px;
         }
 
+        /* Region Tags */
+        .region-tags {
+            padding: 8px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            min-height: 36px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .region-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            background: #f0f0f0;
+            border: 1px solid var(--border);
+            font-size: 10px;
+        }
+
+        .region-tag-remove {
+            cursor: pointer;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            padding: 0 2px;
+        }
+
+        .region-tags-empty {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        /* Input Section */
         .input-section {
             border-top: 1px solid var(--border);
             background: var(--surface);
-        }
-
-        .model-selector {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            gap: 10px;
-            border-bottom: 1px solid var(--border-soft);
-            background: var(--surface-quiet);
-        }
-
-        .model-selector label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: var(--text);
         }
 
         .input-wrapper {
@@ -250,15 +275,6 @@
             line-height: 36px;
         }
 
-        #promptInput::placeholder {
-            color: #777777;
-        }
-
-        #promptInput:focus {
-            outline: none;
-            border: 1px solid var(--border);
-        }
-
         #sendBtn {
             padding: 8px 16px;
             background: var(--text);
@@ -268,7 +284,6 @@
             cursor: pointer;
             height: 36px;
             min-width: 70px;
-            transition: background 0.1s;
         }
 
         #sendBtn:hover:not(:disabled) {
@@ -286,56 +301,10 @@
             border-top: 1px solid var(--border);
             font-size: 10px;
             color: var(--surface);
-            letter-spacing: 0.5px;
-            display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
-        .cost-display {
-            font-size: 10px;
-            color: var(--surface);
-        }
-
-        .region-tags {
-            padding: 8px 15px;
-            border-bottom: 1px solid #e0e0e0;
-            min-height: 36px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .region-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 8px;
-            background: #f0f0f0;
-            border: 1px solid var(--border);
-            font-size: 10px;
-            color: var(--text);
-        }
-
-        .region-tag-remove {
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--text);
-            background: transparent;
-            border: none;
-            padding: 0 2px;
-        }
-
-        .region-tag-remove:hover {
-            color: var(--text);
-        }
-
-        .region-tags-empty {
-            color: var(--muted);
-            font-size: 10px;
-        }
-
+        /* File Input */
         .file-input-wrapper {
             display: inline-block;
             position: relative;
@@ -347,28 +316,7 @@
             left: -9999px;
         }
 
-        #modelSelect {
-            flex: 1;
-            padding: 6px 10px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            font-size: 11px;
-            cursor: pointer;
-            height: 32px;
-        }
-
-        #modelSelect:focus {
-            outline: none;
-            border: 1px solid var(--border);
-        }
-
-        .no-image {
-            text-align: center;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
+        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -380,42 +328,23 @@
         ::-webkit-scrollbar-thumb {
             background: #cccccc;
         }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #999999;
-        }
-
-        @media (max-width: 900px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .right-panel {
-                width: 100%;
-            }
-
-            .left-panel {
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-            }
-        }
     </style>
 </head>
+
 <body>
     <div class="container">
+        <!-- Left Panel: Image Canvas -->
         <div class="left-panel">
             <div class="image-container" id="imageContainer">
-                <div class="no-image">NO IMAGE</div>
+                <div class="no-image">NO IMAGE<br><br>Upload an image or enter a prompt to generate</div>
             </div>
         </div>
 
+        <!-- Right Panel: Controls -->
         <div class="right-panel">
             <div class="header">
-                <h1>IMAGE EDITOR</h1>
-                <div class="history-nav">
-                    <button class="history-nav-btn" id="undoBtn" onclick="navigateHistory(-1)" disabled title="Undo">←</button>
-                    <button class="history-nav-btn" id="redoBtn" onclick="navigateHistory(1)" disabled title="Redo">→</button>
-                </div>
+                <h1>@{{ handle }}</h1>
+                <a href="/" class="back-link">Back</a>
             </div>
 
             <div class="controls">
@@ -428,45 +357,45 @@
                 <button class="control-btn" onclick="resetSession()">RESET</button>
             </div>
 
+            <div class="analysis-selector">
+                <label for="analysisSelect">Analysis JSON</label>
+                <select id="analysisSelect" onchange="loadAnalysis()">
+                    <option value="">-- Select Analysis --</option>
+                    {% for file in analysis_files %}
+                    {% if not file.is_main %}
+                    <option value="{{ file.filename }}">{{ file.display_name }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
             <div class="history" id="history">
                 <div class="history-empty">No history yet. Upload an image or enter a prompt to begin.</div>
             </div>
 
             <div class="region-tags" id="regionTags">
-                <span class="region-tags-empty">No regions selected. Drag on the image to add one or more areas.</span>
+                <span class="region-tags-empty">No regions selected. Drag on the image to add areas.</span>
             </div>
 
             <div class="input-section">
-                <!-- <div class="model-selector">
-                    <label for="modelSelect">EDITING MODEL:</label>
-                    <select id="modelSelect">
-                        <option value="prunaai/p-image-edit">P-Image-Edit (Fast)</option>
-                        <option value="bytedance/seedream-4">SeeDream-4 (High-Res)</option>
-                        <option value="timothybrooks/instruct-pix2pix">InstructPix2Pix (Classic)</option>
-                    </select>
-                </div> -->
                 <div class="input-wrapper">
-                    <input
-                        type="text"
-                        id="promptInput"
-                        placeholder="Enter prompt..."
-                        onkeydown="if(event.key === 'Enter') { event.preventDefault(); sendPrompt(); }"
-                    />
+                    <input type="text" id="promptInput" placeholder="Enter prompt..."
+                        onkeydown="if(event.key === 'Enter') sendPrompt()">
                     <button id="sendBtn" onclick="sendPrompt()">SEND</button>
                 </div>
                 <div class="status-bar">
                     <span id="statusBar">Ready</span>
-                    <span class="cost-display" id="costDisplay">$0.0000</span>
+                    <span id="costDisplay">$0.0000</span>
                 </div>
             </div>
         </div>
     </div>
 
-        <script>
+    <script>
+        const handle = '{{ handle }}';
         let isProcessing = false;
         let history = [];
         let totalCost = 0.0;
-        // Track all selected regions so multiple areas can be targeted per request.
         let selectedRegions = [];
         let selectionId = 0;
         let canvas = null;
@@ -475,15 +404,61 @@
         let startX = 0;
         let startY = 0;
 
-        // Image history navigation
-        let imageHistory = [];  // Array of {url, historyState, cost} objects
-        let currentHistoryIndex = -1;  // Current position in history
+        let currentAnalysis = null;
+        let universalElements = null;
 
         const selectionStyles = {
             fill: 'rgba(0, 0, 0, 0.12)',
             stroke: '#000000',
             lineWidth: 1
         };
+
+        // Load universal elements on page load
+        async function loadUniversalElements() {
+            try {
+                const response = await fetch(`/universal-elements/${handle}`);
+                const data = await response.json();
+                if (!data.error) {
+                    universalElements = data;
+                }
+            } catch (error) {
+                console.error('Failed to load universal elements:', error);
+            }
+        }
+
+        async function loadAnalysis() {
+            const select = document.getElementById('analysisSelect');
+            const filename = select.value;
+
+            if (!filename) {
+                currentAnalysis = null;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/analysis-content/${handle}/${filename}`);
+                const data = await response.json();
+
+                if (!data.error) {
+                    currentAnalysis = data;
+                }
+            } catch (error) {
+                console.error('Failed to load analysis:', error);
+            }
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const toggle = document.getElementById(sectionId.replace('Section', 'Toggle'));
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                toggle.textContent = '▼';
+            } else {
+                section.style.display = 'none';
+                toggle.textContent = '▶';
+            }
+        }
 
         function updateStatus(message) {
             document.getElementById('statusBar').textContent = message;
@@ -494,52 +469,9 @@
             document.getElementById('costDisplay').textContent = `$${cost.toFixed(4)}`;
         }
 
-        function updateHistoryButtons() {
-            const undoBtn = document.getElementById('undoBtn');
-            const redoBtn = document.getElementById('redoBtn');
-
-            undoBtn.disabled = currentHistoryIndex <= 0;
-            redoBtn.disabled = currentHistoryIndex >= imageHistory.length - 1;
-        }
-
-        function addToImageHistory(url, historyState, cost) {
-            // If we're not at the end of history, truncate future states
-            if (currentHistoryIndex < imageHistory.length - 1) {
-                imageHistory = imageHistory.slice(0, currentHistoryIndex + 1);
-            }
-
-            imageHistory.push({
-                url: url,
-                historyState: historyState,
-                cost: cost
-            });
-
-            currentHistoryIndex = imageHistory.length - 1;
-            updateHistoryButtons();
-        }
-
-        function navigateHistory(direction) {
-            const newIndex = currentHistoryIndex + direction;
-
-            if (newIndex < 0 || newIndex >= imageHistory.length) {
-                return;
-            }
-
-            currentHistoryIndex = newIndex;
-            const state = imageHistory[currentHistoryIndex];
-
-            // Restore the image and history state
-            displayImage(state.url);
-            updateHistory(state.historyState);
-            updateCost(state.cost);
-            updateHistoryButtons();
-        }
-
         function getRegionDescription(x, y, width, height, imgWidth, imgHeight) {
-            // Simple 3x3 grid location - p-image-edit works best with general areas
             const centerX = x + width / 2;
             const centerY = y + height / 2;
-
             const relX = centerX / imgWidth;
             const relY = centerY / imgHeight;
 
@@ -572,7 +504,6 @@
             container.innerHTML = '';
             container.appendChild(wrapper);
 
-            // Reset selections because the image context changed.
             selectedRegions = [];
             selectionId = 0;
             updateRegionTags();
@@ -618,13 +549,7 @@
             const width = currentX - startX;
             const height = currentY - startY;
 
-            const previewRegion = {
-                x: startX,
-                y: startY,
-                width,
-                height
-            };
-
+            const previewRegion = { x: startX, y: startY, width, height };
             renderSelections(previewRegion);
         }
 
@@ -681,15 +606,10 @@
             if (!ctx || !canvas) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            selectedRegions.forEach((region) => {
-                drawSelectionRegion(region);
-            });
+            selectedRegions.forEach(region => drawSelectionRegion(region));
 
             if (previewRegion) {
-                drawSelectionRegion(previewRegion, {
-                    fill: 'rgba(0, 0, 0, 0.08)',
-                    lineWidth: 1
-                });
+                drawSelectionRegion(previewRegion, { fill: 'rgba(0, 0, 0, 0.08)', lineWidth: 1 });
             }
         }
 
@@ -697,14 +617,12 @@
             const tagsContainer = document.getElementById('regionTags');
 
             if (selectedRegions.length === 0) {
-                tagsContainer.innerHTML = '<span class="region-tags-empty">No regions selected. Drag on the image to add one or more areas.</span>';
+                tagsContainer.innerHTML = '<span class="region-tags-empty">No regions selected. Drag on the image to add areas.</span>';
                 return;
             }
 
-            tagsContainer.innerHTML = selectedRegions.map((region, index) => {
-                // Show the simple location description
+            tagsContainer.innerHTML = selectedRegions.map(region => {
                 const shortDesc = region.description.replace('the ', '').toUpperCase();
-
                 return `
                     <div class="region-tag">
                         <span>${shortDesc}</span>
@@ -715,13 +633,7 @@
         }
 
         function removeRegion(id) {
-            selectedRegions = selectedRegions.filter((region) => region.id !== id);
-            renderSelections();
-            updateRegionTags();
-        }
-
-        function clearRegions() {
-            selectedRegions = [];
+            selectedRegions = selectedRegions.filter(region => region.id !== id);
             renderSelections();
             updateRegionTags();
         }
@@ -770,9 +682,6 @@
                     displayImage(data.image_url);
                     updateHistory(data.history);
                     updateStatus('Image uploaded');
-
-                    // Add to image history
-                    addToImageHistory(data.image_url, data.history, 0.0);
                 } else {
                     alert('Error: ' + (data.error || 'Upload failed'));
                     updateStatus('Upload failed');
@@ -793,14 +702,14 @@
 
             if (!prompt || isProcessing) return;
 
+            // Add region context if selected
             if (selectedRegions.length > 0) {
-                // Simple: [action] in [location]
                 const regionDesc = selectedRegions.map(r => r.description).join(' and ');
                 prompt = `${prompt} in ${regionDesc}`;
             }
 
-            // const selectedModel = document.getElementById('modelSelect').value;
-            const selectedModel = 'prunaai/p-image-edit'; // Only using p-image-edit
+            // Update debug panel with prompt being sent
+            // Removed debug panel update
 
             isProcessing = true;
             updateStatus('Processing...');
@@ -810,12 +719,11 @@
             try {
                 const response = await fetch('/process', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        prompt: prompt,
-                        model: selectedModel
+                        prompt,
+                        main_json: universalElements,     // Always send main.json
+                        analysis_json: currentAnalysis    // Selected category JSON
                     })
                 });
 
@@ -824,74 +732,42 @@
                 if (data.success) {
                     displayImage(data.image_url);
                     updateHistory(data.history);
-                    if (data.total_cost !== undefined) {
-                        updateCost(data.total_cost);
-                    }
-                    clearRegions();
-                    updateStatus('Complete');
+                    updateCost(data.total_cost);
+                    updateStatus('Done');
                     input.value = '';
-
-                    // Add to image history
-                    addToImageHistory(data.image_url, data.history, data.total_cost || totalCost);
                 } else {
                     alert('Error: ' + (data.error || 'Processing failed'));
-                    updateStatus('Failed');
+                    updateStatus('Error');
                 }
             } catch (error) {
                 alert('Error: ' + error.message);
-                updateStatus('Failed');
+                updateStatus('Error');
             } finally {
                 isProcessing = false;
                 document.getElementById('sendBtn').disabled = false;
                 input.disabled = false;
-                input.focus();
             }
         }
 
         async function resetSession() {
-            if (!confirm('Reset session? This will clear all history.')) return;
-
             try {
                 await fetch('/reset', { method: 'POST' });
-
-                document.getElementById('imageContainer').innerHTML = '<div class="no-image">NO IMAGE</div>';
-                updateHistory([]);
-                document.getElementById('promptInput').value = '';
-                updateCost(0.0);
-                clearRegions();
-                updateStatus('Ready');
-
-                // Reset image history
-                imageHistory = [];
-                currentHistoryIndex = -1;
-                updateHistoryButtons();
+                location.reload();
             } catch (error) {
-                alert('Error resetting session');
+                console.error('Reset failed:', error);
             }
         }
 
-        async function initializeApp() {
-            try {
-                await fetch('/reset', { method: 'POST' });
+        // Initialize
+        loadUniversalElements();
 
-                document.getElementById('imageContainer').innerHTML = '<div class="no-image">NO IMAGE</div>';
-                updateHistory([]);
-                document.getElementById('promptInput').value = '';
-                updateCost(0.0);
-                clearRegions();
-                updateStatus('Ready');
-
-                // Reset image history
-                imageHistory = [];
-                currentHistoryIndex = -1;
-                updateHistoryButtons();
-            } catch (error) {
-                console.error('Error initializing app:', error);
-            }
+        // Auto-select first analysis if available
+        const analysisSelect = document.getElementById('analysisSelect');
+        if (analysisSelect.options.length > 1) {
+            analysisSelect.selectedIndex = 1;
+            loadAnalysis();
         }
-
-        window.addEventListener('load', initializeApp);
     </script>
-
 </body>
+
 </html>

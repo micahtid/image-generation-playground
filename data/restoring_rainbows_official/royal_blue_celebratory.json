@@ -1,0 +1,430 @@
+{
+  "design_system": {
+    "canvas": {
+      "width": 1080,
+      "height": 1350,
+      "aspect_ratio": "4:5"
+    },
+    "colors": {
+      "primary": {
+        "hex": "#005EB8",
+        "name": "royal blue"
+      },
+      "secondary": {
+        "hex": "#FFFFFF",
+        "name": "white"
+      },
+      "accent": {
+        "hex": "#FFD700",
+        "name": "golden yellow"
+      }
+    },
+    "typography": {
+      "headline": {
+        "font_family": "sans-serif",
+        "font_weight": 800,
+        "size_percent": 12,
+        "color": "secondary",
+        "transform": "uppercase",
+        "alignment": "center",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "subheadline": {
+        "font_family": "sans-serif",
+        "font_weight": 600,
+        "size_percent": 6,
+        "color": "secondary",
+        "transform": "none",
+        "alignment": "center",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "body": {
+        "font_family": "sans-serif",
+        "font_weight": 400,
+        "size_percent": 4,
+        "color": "secondary",
+        "alignment": "center"
+      }
+    },
+    "elements": [
+      {
+        "name": "background_container",
+        "type": "container",
+        "description": "royal blue solid container covering the canvas",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 0,
+          "width_percent": 100,
+          "height_percent": 100,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 0,
+          "gap_to_bottom": 0,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "primary"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Base background"
+      },
+      {
+        "name": "happy_new_year_headline",
+        "type": "text",
+        "description": "happy new year text in multiple languages arranged around the central number",
+        "position": {
+          "x_percent": 10,
+          "y_percent": 10,
+          "width_percent": 80,
+          "height_percent": 70,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 10,
+          "gap_to_bottom": 20,
+          "gap_to_left": 10,
+          "gap_to_right": 10
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "secondary"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "text arranged in a circle like position"
+      },
+      {
+        "name": "year_numbers",
+        "type": "text",
+        "description": "Year is at the the center",
+        "position": {
+          "x_percent": 25,
+          "y_percent": 30,
+          "width_percent": 50,
+          "height_percent": 40,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": false,
+          "gap_to_top": 30,
+          "gap_to_bottom": 30,
+          "gap_to_left": 25,
+          "gap_to_right": 25
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "secondary"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "central image is drawn with pencil look"
+      },
+      {
+        "name": "star_decorations",
+        "type": "image",
+        "description": "Star decorations are placed",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 0,
+          "width_percent": 100,
+          "height_percent": 100,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 0,
+          "gap_to_bottom": 0,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "accent"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "star decorations are placed"
+      },
+      {
+        "name": "logo",
+        "type": "logo",
+        "description": "brand logo at the bottom right",
+        "position": {
+          "x_percent": 70,
+          "y_percent": 80,
+          "width_percent": 30,
+          "height_percent": 20,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": true,
+          "gap_to_top": 80,
+          "gap_to_bottom": 0,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "secondary"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "Does not overlap with any element."
+        },
+        "notes": "logo positioned at the bottom right"
+      }
+    ],
+    "element_groups": [],
+    "background": {
+      "type": "solid",
+      "base_color": "primary",
+      "pattern": {
+        "type": null,
+        "description": null,
+        "opacity_percent": null
+      },
+      "overlay": {
+        "enabled": false,
+        "color": null,
+        "opacity_percent": 0
+      }
+    },
+    "logo": {
+      "position": "bottom-right",
+      "x_percent": 70,
+      "y_percent": 80,
+      "size_percent": 20,
+      "style": "white text wordmark"
+    },
+    "decorative_elements": [
+      {
+        "type": "star decoration",
+        "description": "Golden star decorations scattered throughout the background",
+        "color": "golden yellow",
+        "opacity_percent": 100,
+        "position": "background"
+      }
+    ],
+    "global_defaults": {
+      "minimum_margin": 8,
+      "default_corner_radius": 0,
+      "default_shadow": "none",
+      "default_border": "none",
+      "notes": "Defaults that apply unless overridden in individual elements"
+    }
+  },
+  "brand_style": {
+    "mood": "Celebratory, joyful, international, youthful",
+    "keywords": [
+      "vibrant",
+      "clean",
+      "modern",
+      "playful",
+      "accessible"
+    ],
+    "avoid": [
+      "dark colors",
+      "harsh shadows",
+      "cluttered layouts",
+      "thin fonts"
+    ]
+  },
+  "prompt_template": "Create a celebratory Instagram post with a royal blue background. The background is decorated with scattered golden yellow star shapes. The text 'Happy New Year' is written in multiple languages and arranged in a circular pattern around the center of the image. In the center are the white numbers representing the year, stylized with a pencil or crayon effect. The brand logo is positioned at the bottom right corner.",
+  "generation_instructions": {
+    "required": [
+      "Royal blue background",
+      "White text elements",
+      "Scattered golden star shapes",
+      "Brand logo at the bottom right"
+    ],
+    "forbidden": [
+      "DO NOT render hex color codes as visible text",
+      "DO NOT render design metrics as visible text",
+      "DO NOT render degree symbols as visible text"
+    ],
+    "notes": "Technical values are for programmatic reference, the prompt template uses descriptive names."
+  },
+  "image_sequence": {
+    "is_carousel": false,
+    "total_slides": 1,
+    "thumbnail_style": {
+      "description": "Single image - bold, attention grabbing",
+      "unique_elements": [
+        "Centralized year number"
+      ],
+      "text_approach": "Multilingual greeting",
+      "visual_intensity": "High contrast, bold colors"
+    },
+    "content_slide_style": {
+      "description": "None applicable",
+      "template": null,
+      "text_approach": null,
+      "visual_intensity": null
+    },
+    "slide_variations": [],
+    "consistent_elements": [],
+    "changing_elements": []
+  },
+  "asset_recreation": {
+    "photographs": [],
+    "icons": [],
+    "decorative_elements": [
+      {
+        "element_name": "star_decorations",
+        "description": "Randomly scattered stars of different sizes",
+        "style": "Flat two dimensional",
+        "opacity": "100% opaque",
+        "color": "golden yellow"
+      }
+    ],
+    "logo_placeholder": {
+      "text": "[BRAND]",
+      "style": "Bold sans-serif wordmark",
+      "color": "White on colored backgrounds",
+      "position": "Bottom-right corner with comfortable margin"
+    }
+  },
+  "placeholder_guidance": {
+    "headlines": {
+      "voice": "Celebratory, joyful, international",
+      "length": "5-10 words for the complete phrase",
+      "examples": [
+        "Happy New Year",
+        "Bonne Année",
+        "Feliz Año Nuevo",
+        "Shuvo Nabo Barsho",
+        "新年快乐"
+      ],
+      "avoid": [
+        "Negative messages",
+        "Corporate Jargon"
+      ]
+    },
+    "statistics": {
+      "format": null,
+      "realistic_ranges": null,
+      "display_style": null
+    },
+    "supporting_imagery": {
+      "on_brand_subjects": [],
+      "style_notes": null
+    },
+    "dates_and_events": {
+      "date_format": null,
+      "event_types": [],
+      "time_format": null
+    }
+  },
+  "category_id": "royal_blue_celebratory",
+  "category_name": "Royal Blue Celebratory Posts",
+  "category_description": "These posts are defined by a vivid royal blue background and are based around a celebratory announcement. Typography is clean and modern with the brand's color used as accents.",
+  "posts_included": [
+    2,
+    3
+  ],
+  "post_count": 2,
+  "purpose": "announcement",
+  "purpose_correlation": "Announcements related to celebrations use the royal blue background style.",
+  "color_palette_notes": "Consistent palette: royal blue background + candy pink and white accents",
+  "trend_type_primary": "color-based",
+  "trend_types_secondary": [
+    "content-based"
+  ],
+  "trend_type_reasoning": "This category is defined by its royal blue color scheme, creating a strong visual identity. The content focuses on celebratory announcements.",
+  "consistency_tracking": {
+    "logo_placement": {
+      "primary_position": "top-right",
+      "consistency_score": "VARIABLE",
+      "variations": [
+        {
+          "note": "Logo position varies within this category"
+        }
+      ]
+    },
+    "color_scheme": {
+      "consistent": true,
+      "palette_variations": []
+    }
+  }
+}

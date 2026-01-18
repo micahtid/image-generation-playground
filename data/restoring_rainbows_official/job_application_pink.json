@@ -1,0 +1,562 @@
+{
+  "design_system": {
+    "canvas": {
+      "width": 1080,
+      "height": 1350,
+      "aspect_ratio": "4:5"
+    },
+    "colors": {
+      "primary": {
+        "hex": "#FF58C1",
+        "name": "vibrant magenta"
+      },
+      "text": {
+        "hex": "#FFFFFF",
+        "name": "white"
+      }
+    },
+    "typography": {
+      "headline": {
+        "font_family": "League Spartan",
+        "font_weight": 800,
+        "size_percent": 7.4,
+        "color": "text",
+        "transform": "uppercase",
+        "alignment": "left",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "subheadline": {
+        "font_family": "Dancing Script",
+        "font_weight": 700,
+        "size_percent": 6.5,
+        "color": "text",
+        "transform": "none",
+        "alignment": "center",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "body": {
+        "font_family": "Montserrat",
+        "font_weight": 600,
+        "size_percent": 3.3,
+        "color": "text",
+        "alignment": "left"
+      },
+      "cta": {
+        "font_family": "League Spartan",
+        "font_weight": 800,
+        "size_percent": 4.4,
+        "color": "text",
+        "transform": "uppercase",
+        "alignment": "center"
+      }
+    },
+    "elements": [
+      {
+        "name": "headline",
+        "type": "text",
+        "description": "Join Our Executive Team",
+        "position": {
+          "x_percent": 8,
+          "y_percent": 4.4,
+          "width_percent": 60,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": false,
+          "gap_to_top": 4.4,
+          "gap_to_bottom": null,
+          "gap_to_left": 8,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": "social_icons",
+          "gap_below": 1.1,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "headline text"
+      },
+      {
+        "name": "social_icons",
+        "type": "image",
+        "description": "instagram, tiktok, linkedin icons",
+        "position": {
+          "x_percent": 8,
+          "y_percent": 10.4,
+          "width_percent": 15,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 8,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": "headline",
+          "gap_above": 1.1,
+          "element_below": "subheadline",
+          "gap_below": 5.9,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "object_fit": "contain"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "placeholder social icons"
+      },
+      {
+        "name": "subheadline",
+        "type": "text",
+        "description": "Be Part of Our Social Media Team",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 17.4,
+          "width_percent": 100,
+          "height_percent": "auto",
+          "anchor": "top-center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": "social_icons",
+          "gap_above": 5.9,
+          "element_below": "body_text",
+          "gap_below": 5.9,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "subheadline text"
+      },
+      {
+        "name": "body_text",
+        "type": "text",
+        "description": "Help us donate another 40k school supplies and reach another 4 Million + people",
+        "position": {
+          "x_percent": 8,
+          "y_percent": 29.2,
+          "width_percent": 40,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": false,
+          "gap_to_left": 8,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": "subheadline",
+          "gap_above": 5.9,
+          "element_below": "cta",
+          "gap_below": 14.8,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": "image",
+          "gap_right": 8
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "body text"
+      },
+      {
+        "name": "image",
+        "type": "image",
+        "description": "school supplies",
+        "position": {
+          "x_percent": 52,
+          "y_percent": 32.6,
+          "width_percent": 40,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": 8.0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": "body_text",
+          "gap_left": 8,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "object_fit": "cover"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "image"
+      },
+      {
+        "name": "cta",
+        "type": "text",
+        "description": "Apply by December 20",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 50,
+          "width_percent": 100,
+          "height_percent": "auto",
+          "anchor": "bottom-center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": 3.7,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": "body_text",
+          "gap_above": 14.8,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "call to action text"
+      },
+      {
+        "name": "logo",
+        "type": "text",
+        "description": "Restoring Rainbows",
+        "position": {
+          "x_percent": 75,
+          "y_percent": 4.4,
+          "width_percent": 17,
+          "height_percent": "auto",
+          "anchor": "top-right"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": true,
+          "gap_to_top": 4.4,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": 8
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "company logo"
+      }
+    ],
+    "element_groups": [],
+    "background": {
+      "type": "solid with pattern",
+      "base_color": "primary",
+      "pattern": {
+        "type": "organic waves",
+        "description": "Subtle flowing wave shapes in a lighter shade of the base color",
+        "opacity_percent": 15
+      },
+      "overlay": {
+        "enabled": false,
+        "color": null,
+        "opacity_percent": 0
+      }
+    },
+    "logo": {
+      "position": "top-right",
+      "x_percent": 92,
+      "y_percent": 8,
+      "size_percent": 12,
+      "style": "white text wordmark"
+    },
+    "decorative_elements": [
+      {
+        "type": "wave pattern",
+        "description": "Organic flowing curves",
+        "color": "lighter shade of background",
+        "opacity_percent": 15,
+        "position": "background layer"
+      }
+    ],
+    "global_defaults": {
+      "minimum_margin": 8,
+      "default_corner_radius": 0,
+      "default_shadow": "none",
+      "default_border": "none",
+      "notes": "Defaults that apply unless overridden in individual elements"
+    }
+  },
+  "brand_style": {
+    "mood": "Youthful, energetic, hopeful, community-focused",
+    "keywords": [
+      "vibrant",
+      "clean",
+      "modern",
+      "playful",
+      "accessible"
+    ],
+    "avoid": [
+      "dark colors",
+      "harsh shadows",
+      "cluttered layouts",
+      "thin fonts"
+    ]
+  },
+  "prompt_template": "Create a vibrant magenta background with subtle flowing wave shapes in a lighter shade of magenta. In the top-left corner, add the white text 'JOIN OUR EXECUTIVE TEAM' in a bold font, all caps. Below it, add placeholders for social media icons for instagram, tiktok and linkedin. Center a white cursive text that says 'Be Part of Our Social Media Team'. Below that on the left side, add white text that says 'Help us donate another 40k school supplies and reach another 4 Million + people'. On the right, include an image of donated school supplies. Position the image so the right edge is about 8 percent from the edge of the magenta background. Position text 'Apply by December 20' as a white call to action on the bottom. The logo 'Restoring Rainbows' is on the top right corner in white color.",
+  "generation_instructions": {
+    "required": [
+      "vibrant magenta background",
+      "white text headline 'JOIN OUR EXECUTIVE TEAM'",
+      "social media icon placeholders",
+      "white cursive text 'Be Part of Our Social Media Team'",
+      "white text body",
+      "school supplies image",
+      "white text 'Apply by [DATE]'",
+      "logo placeholder"
+    ],
+    "forbidden": [
+      "DO NOT render hex color codes (like #FF58C1) as visible text",
+      "DO NOT render design metrics (font sizes, percentages, coordinates) as visible text",
+      "DO NOT render degree symbols or rotation values as visible text",
+      "NOTE: Content numbers ARE allowed (e.g., '10 volunteers', 'Chapter 5', '2024')",
+      "NOTE: Only DESIGN SPECIFICATION values should be hidden, not content"
+    ],
+    "notes": "Technical values in design_system are for programmatic reference. The prompt_template uses descriptive names for image generation."
+  },
+  "image_sequence": {
+    "is_carousel": false,
+    "total_slides": 1,
+    "thumbnail_style": {
+      "description": "The first slide is the hook - bold, attention-grabbing, minimal text",
+      "unique_elements": [
+        "Large headline"
+      ],
+      "text_approach": "Single punchy headline",
+      "visual_intensity": "High contrast, bold colors, simplified layout"
+    },
+    "content_slide_style": {
+      "description": "Slides 2-N deliver the content - more detailed, educational",
+      "template": "Each slide follows the same structure with varying content",
+      "text_approach": "Subheadline + short paragraphs",
+      "visual_intensity": "Consistent with thumbnail but allows more text density"
+    },
+    "slide_variations": [],
+    "consistent_elements": [
+      "Logo position",
+      "Background color",
+      "Frame/border treatment",
+      "Font choices"
+    ],
+    "changing_elements": [
+      "Headline text",
+      "Body text",
+      "Supporting imagery"
+    ]
+  },
+  "asset_recreation": {
+    "photographs": [
+      {
+        "element_name": "hero_image",
+        "subject": "A pile of brown paper bags filled with colorful school supplies such as crayons, notebooks, pencils, and various stationery items",
+        "style": "candid, indoor",
+        "lighting": "natural light, warm",
+        "color_grading": "warm tones, slight desaturation, high contrast",
+        "framing": "medium shot, subject centered, shallow depth of field",
+        "mask_shape": "rectangular crop with sharp corners"
+      }
+    ],
+    "icons": [
+      {
+        "element_name": "social_media_icons",
+        "concept": "logos for instagram, tiktok and linked in",
+        "style": "line icons, white",
+        "stroke_weight": "medium line",
+        "color": "white"
+      }
+    ],
+    "decorative_elements": [
+      {
+        "element_name": "background_waves",
+        "description": "Organic flowing curves emanating from all corners",
+        "style": "Smooth bezier curves, varying thickness",
+        "opacity": "15% opacity",
+        "color": "Lighter tint of primary color"
+      }
+    ],
+    "logo_placeholder": {
+      "text": "[BRAND]",
+      "style": "Bold sans-serif wordmark",
+      "color": "White on colored backgrounds",
+      "position": "Top-right corner with comfortable margin"
+    }
+  },
+  "placeholder_guidance": {
+    "headlines": {
+      "voice": "Action-oriented, empowering, community-focused",
+      "length": "2-5 words",
+      "examples": [
+        "Join the Movement",
+        "Make Your Impact",
+        "Together We Rise",
+        "Your Story Matters"
+      ],
+      "avoid": [
+        "Negative framing",
+        "Overly corporate language",
+        "Jargon"
+      ]
+    },
+    "statistics": {
+      "format": "Use commas for thousands, spell out 'million/billion'",
+      "realistic_ranges": {
+        "volunteers": "500-50,000",
+        "donations": "$10,000-$500,000",
+        "impact_numbers": "1,000-100,000"
+      },
+      "display_style": "Large bold number + smaller descriptor"
+    },
+    "supporting_imagery": {
+      "on_brand_subjects": [
+        "Diverse groups of people collaborating",
+        "Hands joined or helping",
+        "Community gatherings outdoors",
+        "Close-up authentic smiles",
+        "Nature scenes representing growth"
+      ],
+      "style_notes": "Authentic, candid moments preferred over staged stock photos"
+    },
+    "dates_and_events": {
+      "date_format": "MONTH DD, YYYY or 'THIS SATURDAY'",
+      "event_types": [
+        "Community Meetup",
+        "Volunteer Day",
+        "Workshop",
+        "Celebration"
+      ],
+      "time_format": "10 AM - 2 PM (use AM/PM, not 24-hour)"
+    }
+  },
+  "category_id": "job_application_pink",
+  "category_name": "Job Application Pink Graphic",
+  "category_description": "This category uses a pink background with white text to highlight job applications. The text includes information about the job and how to apply, without an emphasis on visual style of the organization.",
+  "posts_included": [
+    5
+  ],
+  "post_count": 1,
+  "purpose": "call_to_action",
+  "purpose_correlation": "Jobs mostly use pink",
+  "color_palette_notes": "Pink backround with white text",
+  "trend_type_primary": "color-based",
+  "trend_types_secondary": [
+    "typographic-based",
+    "content-based"
+  ],
+  "trend_type_reasoning": "The color is the main reason for this category, with secondary focus on the information provided (typographic-based).",
+  "consistency_tracking": {
+    "logo_placement": {
+      "primary_position": "top-right",
+      "consistency_score": "VARIABLE",
+      "variations": [
+        {
+          "note": "Logo position varies within this category"
+        }
+      ]
+    },
+    "color_scheme": {
+      "consistent": true,
+      "palette_variations": []
+    }
+  }
+}

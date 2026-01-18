@@ -1,0 +1,399 @@
+{
+  "design_system": {
+    "canvas": {
+      "width": 1080,
+      "height": 1350,
+      "aspect_ratio": "4:5"
+    },
+    "colors": {
+      "primary": {
+        "hex": "#005EB8",
+        "name": "royal blue"
+      },
+      "secondary": {
+        "hex": "#FFD700",
+        "name": "golden yellow"
+      },
+      "text": {
+        "hex": "#FFFFFF",
+        "name": "white"
+      }
+    },
+    "typography": {
+      "headline": {
+        "font_family": "League Spartan",
+        "font_weight": 800,
+        "size_percent": 12,
+        "color": "text",
+        "transform": "uppercase",
+        "alignment": "center",
+        "rotation": -20,
+        "rotation_description": "tilted 20 degrees to the left"
+      },
+      "body": {
+        "font_family": "Montserrat",
+        "font_weight": 600,
+        "size_percent": 4,
+        "color": "text",
+        "alignment": "center"
+      }
+    },
+    "elements": [
+      {
+        "name": "year_2026",
+        "type": "text",
+        "description": "the year 2026 in large font",
+        "position": {
+          "x_percent": 50,
+          "y_percent": 40,
+          "width_percent": 80,
+          "height_percent": "auto",
+          "anchor": "center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": false,
+          "gap_to_top": 25,
+          "gap_to_bottom": 35,
+          "gap_to_left": 10,
+          "gap_to_right": 10
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white",
+          "corner_description": "sharp corners",
+          "shadow": "none",
+          "border": "none"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "the 0 contains a pencil in the middle"
+      },
+      {
+        "name": "happy_new_year_messages",
+        "type": "text",
+        "description": "Happy new year messages in various languages",
+        "position": {
+          "x_percent": 20,
+          "y_percent": 60,
+          "width_percent": 60,
+          "height_percent": "auto",
+          "anchor": "center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": false,
+          "gap_to_top": 30,
+          "gap_to_bottom": 5,
+          "gap_to_left": 5,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white",
+          "corner_description": "sharp corners",
+          "shadow": "none",
+          "border": "none"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "rotated at an angle"
+      },
+      {
+        "name": "restoring_rainbows_logo",
+        "type": "logo",
+        "description": "Restoring Rainbows logo",
+        "position": {
+          "x_percent": 80,
+          "y_percent": 90,
+          "width_percent": 30,
+          "height_percent": "auto",
+          "anchor": "center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": true,
+          "touches_left": false,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": 3,
+          "gap_to_left": null,
+          "gap_to_right": 3
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "corner_description": "sharp corners",
+          "shadow": "none",
+          "border": "none"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "logo at the bottom right"
+      },
+      {
+        "name": "star_decorations",
+        "type": "shape",
+        "description": "star decorations scattered around",
+        "position": {
+          "x_percent": 50,
+          "y_percent": 50,
+          "width_percent": 100,
+          "height_percent": 100,
+          "anchor": "center"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 0,
+          "gap_to_bottom": 0,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "golden yellow",
+          "corner_description": "sharp corners",
+          "shadow": "none",
+          "border": "none"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "scattered randomly, varying sizes"
+      }
+    ],
+    "element_groups": [],
+    "background": {
+      "type": "solid",
+      "base_color": "primary",
+      "pattern": {
+        "type": "none",
+        "description": "no pattern",
+        "opacity_percent": 0
+      },
+      "overlay": {
+        "enabled": false,
+        "color": null,
+        "opacity_percent": 0
+      }
+    },
+    "logo": {
+      "position": "bottom-right",
+      "x_percent": 80,
+      "y_percent": 90,
+      "size_percent": 15,
+      "style": "white text wordmark"
+    },
+    "decorative_elements": [
+      {
+        "type": "star",
+        "description": "Gold stars",
+        "color": "golden yellow",
+        "opacity_percent": 100,
+        "position": "scattered around background"
+      }
+    ],
+    "global_defaults": {
+      "minimum_margin": 5,
+      "default_corner_radius": 0,
+      "default_shadow": "none",
+      "default_border": "none",
+      "notes": "Defaults that apply unless overridden in individual elements"
+    }
+  },
+  "brand_style": {
+    "mood": "Youthful, global, positive, inclusive",
+    "keywords": [
+      "bright",
+      "clean",
+      "modern",
+      "accessible"
+    ],
+    "avoid": [
+      "dark",
+      "complex",
+      "dated"
+    ]
+  },
+  "prompt_template": "Create an Instagram post celebrating the new year. The background is solid royal blue. There is a text element with the number 2026 in big, white font, centered slightly above the middle. The '0' in 2026 contains a white pencil icon. Scattered all over the background are various sized golden yellow star shapes.\nBelow the year, angled upwards toward the right, is white text saying 'Happy New Year' in many languages, in varying fonts and sizes. The text extends from the bottom left corner, not quite touching the edges, upwards to around the center of the image.\nThe Restoring Rainbows logo is small, white, and positioned in the bottom-right corner, near both edges. Ensure there are margins.",
+  "generation_instructions": {
+    "required": [
+      "Royal blue background",
+      "Year 2026 in large, white font",
+      "Star decorations",
+      "Restoring Rainbows logo"
+    ],
+    "forbidden": [
+      "Do not include overly complex or realistic images",
+      "Do not include non-English text unless specified"
+    ],
+    "notes": "Use descriptive names for image generation, not hex codes or percentages."
+  },
+  "image_sequence": {
+    "is_carousel": false,
+    "total_slides": 1,
+    "thumbnail_style": {
+      "description": "N/A",
+      "unique_elements": [],
+      "text_approach": "",
+      "visual_intensity": ""
+    },
+    "content_slide_style": {
+      "description": "N/A",
+      "template": "",
+      "text_approach": "",
+      "visual_intensity": ""
+    },
+    "slide_variations": [],
+    "consistent_elements": [],
+    "changing_elements": []
+  },
+  "asset_recreation": {
+    "photographs": [],
+    "icons": [
+      {
+        "element_name": "pencil_icon",
+        "concept": "A simple vertical pencil icon",
+        "style": "flat, white",
+        "stroke_weight": "N/A",
+        "color": "white"
+      }
+    ],
+    "decorative_elements": [
+      {
+        "element_name": "star_decorations",
+        "description": "Various sized five-pointed stars scattered irregularly around the image",
+        "style": "flat filled stars",
+        "opacity": "100%",
+        "color": "golden yellow"
+      }
+    ],
+    "logo_placeholder": {
+      "text": "Restoring Rainbows",
+      "style": "Sans-serif, bold",
+      "color": "white",
+      "position": "Bottom right corner"
+    }
+  },
+  "placeholder_guidance": {
+    "headlines": {
+      "voice": "Celebratory, positive, global",
+      "length": "2-5 words",
+      "examples": [
+        "Happy New Year!",
+        "New Year, New Hope",
+        "Global Greetings!",
+        "2026: A year of change"
+      ],
+      "avoid": [
+        "Negative or cynical language"
+      ]
+    },
+    "statistics": {
+      "format": "Integer",
+      "realistic_ranges": {
+        "number": "no statistics in image"
+      },
+      "display_style": "N/A"
+    },
+    "supporting_imagery": {
+      "on_brand_subjects": [
+        "Diversity",
+        "Art supplies",
+        "Children",
+        "Rainbows",
+        "Earth"
+      ],
+      "style_notes": "Simple designs, flat graphics"
+    },
+    "dates_and_events": {
+      "date_format": "N/A",
+      "event_types": [],
+      "time_format": "N/A"
+    }
+  },
+  "category_id": "branded_message_graphic",
+  "category_name": "Branded Message Graphics",
+  "category_description": "This category features visually clean graphics with messages related to organization updates, greetings, or acknowledgements. It uses the brand's core colors and fonts, often incorporating simple illustrations or design elements, with a focus on clarity and visual consistency.",
+  "posts_included": [
+    2,
+    3
+  ],
+  "post_count": 2,
+  "purpose": "community_engagement",
+  "purpose_correlation": "All community engagements use clean graphics",
+  "color_palette_notes": "Brand's primary colors: vibrant candy pink and royal blue",
+  "trend_type_primary": "style-based",
+  "trend_types_secondary": [
+    "content-based",
+    "typographic-based"
+  ],
+  "trend_type_reasoning": "This category is primarily defined by its clean and consistent visual style (style-based), while also featuring organized information (content-based) that is balanced with clear typography (typographic-based).",
+  "consistency_tracking": {
+    "logo_placement": {
+      "primary_position": "top-right",
+      "consistency_score": "VARIABLE",
+      "variations": [
+        {
+          "note": "Logo position varies within this category"
+        }
+      ]
+    },
+    "color_scheme": {
+      "consistent": true,
+      "palette_variations": []
+    }
+  }
+}

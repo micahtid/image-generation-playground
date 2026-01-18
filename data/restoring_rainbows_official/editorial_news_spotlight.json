@@ -1,0 +1,767 @@
+{
+  "design_system": {
+    "canvas": {
+      "width": 1080,
+      "height": 1350,
+      "aspect_ratio": "4:5"
+    },
+    "colors": {
+      "primary": {
+        "hex": "#1976D2",
+        "name": "royal blue"
+      },
+      "secondary": {
+        "hex": "#FFFFFF",
+        "name": "white"
+      },
+      "tertiary": {
+        "hex": "#000000",
+        "name": "black"
+      },
+      "accent": {
+        "hex": "#F44336",
+        "name": "bright red"
+      }
+    },
+    "typography": {
+      "headline": {
+        "font_family": "Bebas Neue",
+        "font_weight": 700,
+        "size_percent": 13,
+        "color": "tertiary",
+        "transform": "uppercase",
+        "alignment": "left",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "subheadline": {
+        "font_family": "Roboto",
+        "font_weight": 400,
+        "size_percent": 3,
+        "color": "tertiary",
+        "transform": "none",
+        "alignment": "left",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "body": {
+        "font_family": "Roboto",
+        "font_weight": 400,
+        "size_percent": 4,
+        "color": "tertiary",
+        "alignment": "left",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      }
+    },
+    "elements": [
+      {
+        "name": "news_source_section",
+        "type": "container",
+        "description": "Container for the news source: a thick banner across the top of the image.",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 0,
+          "width_percent": 100,
+          "height_percent": 6,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 0,
+          "gap_to_bottom": null,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": "headline_text_section",
+          "gap_below": 2,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "primary"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Container spans the entire width of the image at the top."
+      },
+      {
+        "name": "news_source_logo_container",
+        "type": "container",
+        "description": "Container for the news source logo",
+        "position": {
+          "x_percent": 3,
+          "y_percent": 50,
+          "width_percent": 10,
+          "height_percent": 70,
+          "anchor": "center-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 0,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": "news_text",
+          "gap_right": 2
+        },
+        "visual": {
+          "fill_type": "none"
+        },
+        "overlap": {
+          "overlaps_with": "news_source_section",
+          "overlap_description": "contained within news source section."
+        },
+        "notes": "no visible background, placeholder for icon."
+      },
+      {
+        "name": "news_source_logo",
+        "type": "logo",
+        "description": "Placeholder news logo.",
+        "position": {
+          "x_percent": 50,
+          "y_percent": 50,
+          "width_percent": 90,
+          "height_percent": 90,
+          "anchor": "center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "secondary"
+        },
+        "overlap": {
+          "overlaps_with": "news_source_logo_container",
+          "overlap_description": "Placed on top of container"
+        },
+        "notes": "Logo placed inside logo container"
+      },
+      {
+        "name": "news_text",
+        "type": "text",
+        "description": "Text next to logo",
+        "position": {
+          "x_percent": 14,
+          "y_percent": 50,
+          "width_percent": 20,
+          "height_percent": 80,
+          "anchor": "center-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": "news_source_logo_container",
+          "gap_left": 2,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "secondary"
+        },
+        "overlap": {
+          "overlaps_with": "news_source_section",
+          "overlap_description": "Contained within news source section."
+        },
+        "notes": "displays news source."
+      },
+      {
+        "name": "headline_text_section",
+        "type": "container",
+        "description": "Container for the headline text of the article",
+        "position": {
+          "x_percent": 5,
+          "y_percent": 8,
+          "width_percent": 90,
+          "height_percent": 15,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 5,
+          "gap_to_right": 5
+        },
+        "spacing": {
+          "element_above": "news_source_section",
+          "gap_above": 2,
+          "element_below": "image_section",
+          "gap_below": 2,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "none"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "No overlap"
+        },
+        "notes": "Container for the article's headline."
+      },
+      {
+        "name": "headline_text",
+        "type": "text",
+        "description": "The actual text for the headline",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 0,
+          "width_percent": 100,
+          "height_percent": 100,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 0,
+          "gap_to_bottom": 0,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white"
+        },
+        "overlap": {
+          "overlaps_with": "headline_text_section",
+          "overlap_description": "Takes up the entire container of the headline section."
+        },
+        "notes": "headline text"
+      },
+      {
+        "name": "image_section",
+        "type": "container",
+        "description": "container for the article image",
+        "position": {
+          "x_percent": 5,
+          "y_percent": 25,
+          "width_percent": 90,
+          "height_percent": 60,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 5,
+          "gap_to_right": 5
+        },
+        "spacing": {
+          "element_above": "headline_text_section",
+          "gap_above": 2,
+          "element_below": "summary_section",
+          "gap_below": 2,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "none"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "No overlap"
+        },
+        "notes": "No background, only contains image"
+      },
+      {
+        "name": "article_image",
+        "type": "image",
+        "description": "image from the article.",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 0,
+          "width_percent": 100,
+          "height_percent": 100,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 0,
+          "gap_to_bottom": 0,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "object_fit": "cover"
+        },
+        "overlap": {
+          "overlaps_with": "image_section",
+          "overlap_description": "Takes up the entire container of the image section"
+        },
+        "notes": "image container"
+      },
+      {
+        "name": "summary_section",
+        "type": "container",
+        "description": "container for summary text.",
+        "position": {
+          "x_percent": 5,
+          "y_percent": 87,
+          "width_percent": 90,
+          "height_percent": 10,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 5,
+          "gap_to_right": 5
+        },
+        "spacing": {
+          "element_above": "image_section",
+          "gap_above": 2,
+          "element_below": "footer_section",
+          "gap_below": 1,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "none"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "No overlap"
+        },
+        "notes": "container without background."
+      },
+      {
+        "name": "article_summary",
+        "type": "text",
+        "description": "short summary of the article.",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 0,
+          "width_percent": 100,
+          "height_percent": 100,
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 0,
+          "gap_to_bottom": 0,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "black"
+        },
+        "overlap": {
+          "overlaps_with": "summary_section",
+          "overlap_description": "Takes up the entire container of the summary section."
+        },
+        "notes": "Short summary of article."
+      },
+      {
+        "name": "footer_section",
+        "type": "container",
+        "description": "black section on the bottom of the image",
+        "position": {
+          "x_percent": 0,
+          "y_percent": 98,
+          "width_percent": 100,
+          "height_percent": 2,
+          "anchor": "bottom-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": 0,
+          "gap_to_left": 0,
+          "gap_to_right": 0
+        },
+        "spacing": {
+          "element_above": "summary_section",
+          "gap_above": 1,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "tertiary"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "No overlap"
+        },
+        "notes": "black background"
+      },
+      {
+        "name": "brand_logo_section",
+        "type": "container",
+        "description": "Brand logo.",
+        "position": {
+          "x_percent": 85,
+          "y_percent": 4,
+          "width_percent": 14,
+          "height_percent": 5,
+          "anchor": "top-right"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": 1
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": 0,
+          "element_below": "headline_text_section",
+          "gap_below": 0,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": 0
+        },
+        "visual": {
+          "fill_type": "none"
+        },
+        "overlap": {
+          "overlaps_with": "news_source_section",
+          "overlap_description": "over the blue container"
+        },
+        "notes": "logo place holder."
+      },
+      {
+        "name": "brand_logo",
+        "type": "logo",
+        "description": "Brand logo.",
+        "position": {
+          "x_percent": 50,
+          "y_percent": 50,
+          "width_percent": 90,
+          "height_percent": 90,
+          "anchor": "center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "white"
+        },
+        "overlap": {
+          "overlaps_with": "brand_logo_section",
+          "overlap_description": "on container"
+        },
+        "notes": "logo place holder."
+      }
+    ],
+    "element_groups": [],
+    "background": {
+      "type": "solid",
+      "base_color": "secondary",
+      "pattern": {
+        "type": null,
+        "description": null,
+        "opacity_percent": null
+      },
+      "overlay": {
+        "enabled": false,
+        "color": null,
+        "opacity_percent": 0
+      }
+    },
+    "logo": {
+      "position": "top-right",
+      "x_percent": 85,
+      "y_percent": 4,
+      "size_percent": 14,
+      "style": "white text wordmark"
+    },
+    "decorative_elements": [],
+    "global_defaults": {
+      "minimum_margin": 8,
+      "default_corner_radius": 0,
+      "default_shadow": "none",
+      "default_border": "none",
+      "corner_radius": 0,
+      "notes": "Defaults that apply unless overridden in individual elements"
+    }
+  },
+  "brand_style": {
+    "mood": "Professional, informative, trustworthy",
+    "keywords": [
+      "clean",
+      "modern",
+      "news",
+      "bold",
+      "readable"
+    ],
+    "avoid": [
+      "decorative fonts",
+      "soft shadows",
+      "gradients",
+      "complex layouts"
+    ]
+  },
+  "prompt_template": "Create a social media post in the style of an editorial news spotlight, adhering to a clean and professional design. The background is white. At the top of the post, there is a royal blue banner that spans the entire width of the image. Inside the blue banner, positioned on the left side, there is a news source logo placeholder in white with the word 'News' next to it, also in white. The news logo placeholder is circular. On the top right corner of the banner, place brand logo, also in white. Below the blue banner is the article's headline text that spans almost the entire width of the image. The text color of the headline is black. There is sufficient spacing between the blue banner and the headline. Underneath the article headline is the featured image, which covers the majority of the space under headline. Finally, there is a small black bar at the very bottom of the post, and a short summary of the article above it, in black text. Post utilizes 'Bebas Neue' for the headlines and 'Roboto' for supporting text.",
+  "generation_instructions": {
+    "required": [
+      "Blue banner at the top",
+      "Article Headline",
+      "Featured Image",
+      "Black Bar at the Bottom"
+    ],
+    "forbidden": [
+      "DO NOT render hex color codes (like #FF58C1) as visible text",
+      "DO NOT render design metrics (font sizes, percentages, coordinates) as visible text",
+      "DO NOT render degree symbols or rotation values as visible text",
+      "NOTE: Content numbers ARE allowed (e.g., '10 volunteers', 'Chapter 5', '2024')",
+      "NOTE: Only DESIGN SPECIFICATION values should be hidden, not content"
+    ],
+    "notes": "Technical values in design_system are for programmatic reference. The prompt_template uses descriptive names for image generation."
+  },
+  "image_sequence": {
+    "is_carousel": false,
+    "total_slides": 1,
+    "thumbnail_style": null,
+    "content_slide_style": null,
+    "slide_variations": [],
+    "consistent_elements": [],
+    "changing_elements": []
+  },
+  "asset_recreation": {
+    "photographs": [
+      {
+        "element_name": "article_image",
+        "subject": "Image related to the news article's topic",
+        "style": "Realistic, candid",
+        "lighting": "Natural lighting",
+        "color_grading": "Neutral tones, slight contrast",
+        "framing": "Medium or wide shot, depending on the subject",
+        "mask_shape": "None. Rectangular"
+      }
+    ],
+    "icons": [
+      {
+        "element_name": "news_logo",
+        "concept": "Generic news logo icon",
+        "style": "Flat, single color",
+        "stroke_weight": "N/A",
+        "color": "White"
+      }
+    ],
+    "decorative_elements": [],
+    "logo_placeholder": {
+      "text": "[BRAND]",
+      "style": "Sans-serif wordmark",
+      "color": "White",
+      "position": "Top-right corner of the blue banner, aligned to the right edge of the banner"
+    }
+  },
+  "placeholder_guidance": {
+    "headlines": {
+      "voice": "Informative, objective, attention-grabbing",
+      "length": "4-8 words",
+      "examples": [
+        "Local Students Make a Difference",
+        "Community Rallies for Clean Energy",
+        "New Initiative Boosts Education",
+        "Volunteer Efforts Transform City"
+      ],
+      "avoid": [
+        "Sensationalism",
+        "Bias",
+        "Vague or confusing language"
+      ]
+    },
+    "statistics": {
+      "format": "Use commas for thousands, if applicable",
+      "realistic_ranges": {
+        "volunteers": "100-5000",
+        "donations": "$500-$10000",
+        "impact_numbers": "10-1000"
+      },
+      "display_style": "Bold, clear number followed by a brief description"
+    },
+    "supporting_imagery": {
+      "on_brand_subjects": [
+        "Volunteers working",
+        "Community event",
+        "Students in a classroom",
+        "Local landmarks",
+        "People helping each other"
+      ],
+      "style_notes": "Avoid staged photos, aim for authentic scenes"
+    },
+    "dates_and_events": {
+      "date_format": "MONTH DD, YYYY",
+      "event_types": [
+        "Community Meeting",
+        "Fundraising Event",
+        "Workshop",
+        "Volunteer Day"
+      ],
+      "time_format": "HH:MM AM/PM"
+    }
+  },
+  "category_id": "editorial_news_spotlight",
+  "category_name": "Editorial News Spotlight",
+  "category_description": "This category showcases news articles featuring the organization. Defined by the screenshot of the article, it uses bold typography on top of the original publication's styling.",
+  "posts_included": [
+    1,
+    4
+  ],
+  "post_count": 2,
+  "purpose": "announcement",
+  "purpose_correlation": "All announcements use screenshots from news features.",
+  "color_palette_notes": "Palette derives from the original news publication; accented with brand's candy pink and royal blue",
+  "trend_type_primary": "style-based",
+  "trend_types_secondary": [
+    "media-based",
+    "content-based"
+  ],
+  "trend_type_reasoning": "This category is primarily defined by its bold editorial visual style (style-based), with secondary emphasis on photography/screenshot usage (media-based) and announcement content (content-based).",
+  "consistency_tracking": {
+    "logo_placement": {
+      "primary_position": "top-right",
+      "consistency_score": "VARIABLE",
+      "variations": [
+        {
+          "note": "Logo position varies within this category"
+        }
+      ]
+    },
+    "color_scheme": {
+      "consistent": true,
+      "palette_variations": []
+    }
+  }
+}

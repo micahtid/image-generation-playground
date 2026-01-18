@@ -1,0 +1,557 @@
+{
+  "design_system": {
+    "canvas": {
+      "width": 1080,
+      "height": 1350,
+      "aspect_ratio": "4:5"
+    },
+    "colors": {
+      "primary": {
+        "hex": "#FF58C1",
+        "name": "vibrant magenta"
+      },
+      "text": {
+        "hex": "#FFFFFF",
+        "name": "white"
+      }
+    },
+    "typography": {
+      "headline": {
+        "font_family": "League Spartan",
+        "font_weight": 800,
+        "size_percent": 6.66,
+        "color": "text",
+        "transform": "uppercase",
+        "alignment": "left",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "subheadline": {
+        "font_family": "Dancing Script",
+        "font_weight": 700,
+        "size_percent": 6.66,
+        "color": "text",
+        "transform": "none",
+        "alignment": "center",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "body": {
+        "font_family": "Montserrat",
+        "font_weight": 600,
+        "size_percent": 3,
+        "color": "text",
+        "alignment": "left"
+      },
+      "call_to_action": {
+        "font_family": "League Spartan",
+        "font_weight": 800,
+        "size_percent": 4.44,
+        "color": "text",
+        "transform": "uppercase",
+        "alignment": "center",
+        "rotation": 0,
+        "rotation_description": "horizontal"
+      },
+      "logo_text": {
+        "font_family": "Montserrat",
+        "font_weight": 600,
+        "size_percent": 2.5,
+        "color": "text",
+        "alignment": "right"
+      }
+    },
+    "elements": [
+      {
+        "name": "headline",
+        "type": "text",
+        "description": "Main headline",
+        "position": {
+          "x_percent": 8,
+          "y_percent": 5,
+          "width_percent": 84,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": 5,
+          "gap_to_bottom": null,
+          "gap_to_left": 8,
+          "gap_to_right": 8
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": "social_media_icons",
+          "gap_below": 1,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "text"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Uppercase text"
+      },
+      {
+        "name": "social_media_icons",
+        "type": "image",
+        "description": "Social media icons",
+        "position": {
+          "x_percent": 8,
+          "y_percent": 13,
+          "width_percent": 21,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 8,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": "headline",
+          "gap_above": 1,
+          "element_below": "subheadline",
+          "gap_below": 4,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "object_fit": "contain"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Icons are white"
+      },
+      {
+        "name": "subheadline",
+        "type": "text",
+        "description": "Secondary headline",
+        "position": {
+          "x_percent": 50,
+          "y_percent": 20,
+          "width_percent": 84,
+          "height_percent": "auto",
+          "anchor": "top-center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 8,
+          "gap_to_right": 8
+        },
+        "spacing": {
+          "element_above": "social_media_icons",
+          "gap_above": 4,
+          "element_below": "body_text",
+          "gap_below": 5,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "text"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Cursive font"
+      },
+      {
+        "name": "body_text",
+        "type": "text",
+        "description": "Main content text",
+        "position": {
+          "x_percent": 8,
+          "y_percent": 30,
+          "width_percent": 40,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": true,
+          "touches_right": false,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": 8,
+          "gap_to_right": null
+        },
+        "spacing": {
+          "element_above": "subheadline",
+          "gap_above": 5,
+          "element_below": "call_to_action",
+          "gap_below": 5,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": "image",
+          "gap_right": 4
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "text"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Left aligned text"
+      },
+      {
+        "name": "image",
+        "type": "image",
+        "description": "Supporting image",
+        "position": {
+          "x_percent": 52,
+          "y_percent": 30,
+          "width_percent": 40,
+          "height_percent": "auto",
+          "anchor": "top-left"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": 8
+        },
+        "spacing": {
+          "element_above": "subheadline",
+          "gap_above": 5,
+          "element_below": "call_to_action",
+          "gap_below": 5,
+          "element_left": "body_text",
+          "gap_left": 4,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "object_fit": "cover"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Image on right"
+      },
+      {
+        "name": "call_to_action",
+        "type": "text",
+        "description": "Call to action text",
+        "position": {
+          "x_percent": 50,
+          "y_percent": 85,
+          "width_percent": 84,
+          "height_percent": "auto",
+          "anchor": "bottom-center"
+        },
+        "edges": {
+          "touches_top": false,
+          "touches_bottom": true,
+          "touches_left": true,
+          "touches_right": true,
+          "gap_to_top": null,
+          "gap_to_bottom": 5,
+          "gap_to_left": 8,
+          "gap_to_right": 8
+        },
+        "spacing": {
+          "element_above": "body_text",
+          "gap_above": 5,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "text"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Uppercase text, centered"
+      },
+      {
+        "name": "logo_text",
+        "type": "text",
+        "description": "Brand name",
+        "position": {
+          "x_percent": 92,
+          "y_percent": 5,
+          "width_percent": 12,
+          "height_percent": "auto",
+          "anchor": "top-right"
+        },
+        "edges": {
+          "touches_top": true,
+          "touches_bottom": false,
+          "touches_left": false,
+          "touches_right": true,
+          "gap_to_top": 5,
+          "gap_to_bottom": null,
+          "gap_to_left": null,
+          "gap_to_right": 8
+        },
+        "spacing": {
+          "element_above": null,
+          "gap_above": null,
+          "element_below": null,
+          "gap_below": null,
+          "element_left": null,
+          "gap_left": null,
+          "element_right": null,
+          "gap_right": null
+        },
+        "visual": {
+          "fill_type": "solid",
+          "fill_color": "text"
+        },
+        "overlap": {
+          "overlaps_with": null,
+          "overlap_description": "no overlap"
+        },
+        "notes": "Right-aligned logo text"
+      }
+    ],
+    "element_groups": [],
+    "background": {
+      "type": "solid with pattern",
+      "base_color": "primary",
+      "pattern": {
+        "type": "organic waves",
+        "description": "Subtle flowing wave shapes in a lighter shade of the base color",
+        "opacity_percent": 15
+      },
+      "overlay": {
+        "enabled": false,
+        "color": null,
+        "opacity_percent": 0
+      }
+    },
+    "logo": {
+      "position": "top-right",
+      "x_percent": 92,
+      "y_percent": 5,
+      "size_percent": 12,
+      "style": "white text wordmark"
+    },
+    "decorative_elements": [
+      {
+        "type": "wave pattern",
+        "description": "Organic flowing curves",
+        "color": "lighter shade of background",
+        "opacity_percent": 20,
+        "position": "background layer"
+      }
+    ],
+    "global_defaults": {
+      "minimum_margin": 8,
+      "default_corner_radius": 0,
+      "default_shadow": "none",
+      "default_border": "none",
+      "notes": "Defaults that apply unless overridden in individual elements"
+    }
+  },
+  "brand_style": {
+    "mood": "Youthful, energetic, hopeful, community-focused",
+    "keywords": [
+      "vibrant",
+      "clean",
+      "modern",
+      "playful",
+      "accessible"
+    ],
+    "avoid": [
+      "dark colors",
+      "harsh shadows",
+      "cluttered layouts",
+      "thin fonts"
+    ]
+  },
+  "prompt_template": "Create an Instagram post with a vibrant magenta background that features subtle organic flowing wave patterns. In the top left corner, place a large headline text in white, all uppercase. Below the headline is a row of social media icons near the top, aligned horizontally. Below that is subheadline text in white that is centered. Below the subheadline, place a block of body text which overlaps on the right with an image. In the top right corner of the design place a white text wordmark with the brand name. At the bottom, centered, is a call to action in white, uppercase text. The top edge of the headline is near top and left edge of the canvas. The social media icons are positioned below the headline. The main content block is below the subheadline with a supporting photograph to the right of the text. The bottom edge of the call to action extends close to the bottom edge.",
+  "generation_instructions": {
+    "required": [
+      "Vibrant magenta background",
+      "White text",
+      "Headline, subheadline, body text, and call to action",
+      "Social media icons",
+      "Supporting image",
+      "Wordmark Logo"
+    ],
+    "forbidden": [
+      "DO NOT render hex color codes (like #FF58C1) as visible text",
+      "DO NOT render design metrics (font sizes, percentages, coordinates) as visible text",
+      "DO NOT render degree symbols or rotation values as visible text",
+      "NOTE: Content numbers ARE allowed (e.g., '10 volunteers', 'Chapter 5', '2024')",
+      "NOTE: Only DESIGN SPECIFICATION values should be hidden, not content"
+    ],
+    "notes": "Technical values in design_system are for programmatic reference. The prompt_template uses descriptive names for image generation."
+  },
+  "image_sequence": {
+    "is_carousel": false,
+    "total_slides": 1,
+    "thumbnail_style": {
+      "description": "N/A",
+      "unique_elements": [],
+      "text_approach": "N/A",
+      "visual_intensity": "N/A"
+    },
+    "content_slide_style": {
+      "description": "N/A",
+      "template": null,
+      "text_approach": null,
+      "visual_intensity": null
+    },
+    "slide_variations": [],
+    "consistent_elements": [],
+    "changing_elements": []
+  },
+  "asset_recreation": {
+    "photographs": [
+      {
+        "element_name": "hero_image",
+        "subject": "A diverse collection of school supplies in partly filled brown paper bags.",
+        "style": "indoor, relatively high-key but with soft shadows",
+        "lighting": "natural lighting, diffused, warm tones",
+        "color_grading": "warm tones, slight desaturation",
+        "framing": "medium shot, items fill a brown paper bag. The bags are slightly open",
+        "mask_shape": "rectangular crop with sharp corners"
+      }
+    ],
+    "icons": [
+      {
+        "element_name": "social_media_icons",
+        "concept": "Instagram, TikTok, and LinkedIn",
+        "style": "flat outlined icons, single color",
+        "stroke_weight": "medium lines",
+        "color": "white"
+      }
+    ],
+    "decorative_elements": [
+      {
+        "element_name": "background_waves",
+        "description": "Organic flowing curves emanating from all corners",
+        "style": "Smooth bezier curves, varying thickness",
+        "opacity": "15-20% opacity",
+        "color": "Lighter tint of primary color"
+      }
+    ],
+    "logo_placeholder": {
+      "text": "[BRAND]",
+      "style": "Bold sans-serif wordmark",
+      "color": "White on colored backgrounds",
+      "position": "Top-right corner with comfortable margin"
+    }
+  },
+  "placeholder_guidance": {
+    "headlines": {
+      "voice": "Action-oriented, empowering, community-focused",
+      "length": "2-5 words",
+      "examples": [
+        "Join the Movement",
+        "Make Your Impact",
+        "Together We Rise",
+        "Your Story Matters"
+      ],
+      "avoid": [
+        "Negative framing",
+        "Overly corporate language",
+        "Jargon"
+      ]
+    },
+    "statistics": {
+      "format": "Use commas for thousands, spell out 'million/billion'",
+      "realistic_ranges": {
+        "volunteers": "500-50,000",
+        "donations": "$10,000-$500,000",
+        "impact_numbers": "1,000-100,000"
+      },
+      "display_style": "Large bold number + smaller descriptor"
+    },
+    "supporting_imagery": {
+      "on_brand_subjects": [
+        "Diverse groups of people collaborating",
+        "Hands joined or helping",
+        "Community gatherings outdoors",
+        "Close-up authentic smiles",
+        "Nature scenes representing growth"
+      ],
+      "style_notes": "Authentic, candid moments preferred over staged stock photos"
+    },
+    "dates_and_events": {
+      "date_format": "MONTH DD, YYYY or 'THIS SATURDAY'",
+      "event_types": [
+        "Community Meetup",
+        "Volunteer Day",
+        "Workshop",
+        "Celebration"
+      ],
+      "time_format": "10 AM - 2 PM (use AM/PM, not 24-hour)"
+    }
+  },
+  "category_id": "candy_pink_open_call",
+  "category_name": "Candy Pink Open Call",
+  "category_description": "These are visually striking posts that use a eye-catching candy pink background to attract viewer attention, specifically when there need to make a call to action post for the public. Uses brand colors and adds social media brand icons",
+  "posts_included": [
+    5
+  ],
+  "post_count": 1,
+  "purpose": "call to action",
+  "purpose_correlation": "All calls to action use the vibrant pink background.",
+  "color_palette_notes": "Consistent palette: candy pink background with royal blue accents",
+  "trend_type_primary": "color-based",
+  "trend_types_secondary": [
+    "content-based"
+  ],
+  "trend_type_reasoning": "This category is primarily defined by its vibrant candy pink background, and its purpose of making a call to action to the public",
+  "consistency_tracking": {
+    "logo_placement": {
+      "primary_position": "top-right",
+      "consistency_score": "VARIABLE",
+      "variations": [
+        {
+          "note": "Logo position varies within this category"
+        }
+      ]
+    },
+    "color_scheme": {
+      "consistent": true,
+      "palette_variations": []
+    }
+  }
+}
