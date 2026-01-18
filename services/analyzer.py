@@ -32,12 +32,13 @@ A category is defined by CONTENT THEME + VISUAL STYLE combined:
 CRITICAL RULES:
 1. Categories are NOT component-level details (don't say "minimalist text overlays" - instead say "Educational content with minimalist text-on-solid-background style")
 2. Define categories based on the OVERALL design of each post as a whole
-3. Identify 2-4 categories (don't over-segment into 5 separate categories for 5 posts)
-4. A category needs at least 2 posts to be valid (exception: if Post 1 doesn't fit any multi-post category, it gets its own)
+3. Identify 2-4 categories when possible; only use 5 if ALL posts are truly distinct (avoid over-segmentation)
+4. A category can be single-post if it is truly unique; DO NOT force unrelated posts together just to reach 2+ posts
 5. Post 1 (newest) ALWAYS gets included in a category OR defines a new one if truly unique
 6. Track logo placement consistency PER CATEGORY (not globally)
-7. Color palettes CAN BE categories themselves (e.g., "Vibrant pink announcements" vs "Muted pastel announcements")
-8. A category CAN have multiple color palettes (e.g., "Nature posts" might use both "Spring greens" and "Autumn oranges")
+7. If posts share the SAME content theme + layout + typography style but differ only by color, they should be in the SAME category (color variation within a style is valid)
+8. Color palettes CAN be categories themselves ONLY when color treatment is the PRIMARY differentiator (e.g., monochrome duotone vs full-color gradients)
+9. A category CAN have multiple color palettes (e.g., "Nature posts" might use both "Spring greens" and "Autumn oranges")
 
 TREND TYPE CLASSIFICATION:
 Each category must be classified by its PRIMARY trend type. This helps identify what fundamentally defines the category:
@@ -126,6 +127,38 @@ You have multiple posts. Post 1 is the NEWEST (most recent).
 
 **RESULT**: The design system should primarily reflect Post 1, validated by patterns from other posts.
 
+## TEMPLATE + VARIATION MODE (NEW)
+
+The output JSON is a BASE TEMPLATE, not a 1:1 reconstruction.
+- Capture the core components, hierarchy, and style DNA for the category.
+- Provide explicit quantitative specs, PLUS allowable variation ranges so new layouts can differ while staying on-brand.
+- Every constraint must be unambiguous; variation is only allowed where you explicitly define it.
+
+## ANTI-HALLUCINATION + PRECISION RULES
+
+- Do NOT infer details that are not clearly visible. If you are unsure, omit the detail.
+- Rotation/tilt: Only specify rotation if it is clearly present. Otherwise treat text and shapes as perfectly horizontal (no tilt).
+- If multiple text orientations exist, list each orientation and assign elements to each; never collapse to a single angle.
+- Quantitative mandate: Provide numeric values for size, position, gaps, rotation degrees, line height, and counts for every element.
+- Counts: Explicitly state the exact count of icons, decorations, and repeated elements. Do NOT duplicate elements unless they exist in the source.
+- Edge contact: If an element touches an edge, set the corresponding `touches_*` to true and `gap_*` to 0 (do not invent margins).
+- Layout fidelity: Do NOT normalize or tidy the layout. If spacing or alignment is uneven, staggered, or intentionally irregular, state it explicitly.
+- If elements visually interleave or "slide into" each other, document overlap and z-order in `overlap`.
+
+## SPACING AND BREATHING ROOM
+
+- Always specify spacing between components using the `spacing` and `edges` gaps.
+- Preserve the observed negative space; ensure the layout does not feel cramped by documenting the real margins and gaps.
+- If the layout feels tight, reduce element sizes or increase gaps to create breathing room while keeping overall balance.
+- For major elements, name the nearest neighbor above/below/left/right with explicit gaps so spacing is never implicit.
+- Avoid vague spacing terms like "distributed"; use numeric gaps or explicit ranges (e.g., 12-18px).
+
+## VARIATION GUIDANCE REQUIREMENTS
+
+- Provide explicit numeric ranges for any allowed variation (position, size, spacing, rotation).
+- Specify what can vary vs what must remain fixed (non-negotiables).
+- If randomness is desired, define the strength (0-1) and the range for each variable.
+
 ## IMAGE SEQUENCE DIRECTION (CAROUSEL POSTS)
 
 If a post contains multiple images (carousel), you MUST analyze each image's role and provide specific direction for each position:
@@ -167,11 +200,14 @@ The image generation model will NOT have access to the original photos, icons, d
 - Describe the icon style (flat, outlined, filled, 3D, hand-drawn, etc.)
 - Specify the stroke weight relative to the overall design (thin/medium/thick lines)
 - Describe the exact icon concept (e.g., "a simple calendar icon showing a checkmark on a date")
+- Specify the EXACT number of icons and whether they are unique or repeated (do NOT duplicate icons unless they appear multiple times)
 - If custom illustrations, describe the illustration style (minimalist, detailed, cartoonish, realistic)
 
 **FOR DECORATIVE ELEMENTS**:
 - Describe patterns in detail (e.g., "organic flowing wave shapes curving from bottom-left to top-right")
 - Specify if decorations are geometric or organic, symmetrical or asymmetric
+- Specify the EXACT count of decorative elements and the coverage area they occupy
+- Specify size range relative to nearby text (e.g., "stars range from slightly smaller than the multilingual text height to about 1.5x that height")
 - Describe any texture overlays (grain, noise, paper texture, etc.)
 - Specify opacity and blending with background
 
@@ -209,30 +245,47 @@ Include a `placeholder_guidance` object with these recommendations so the image 
 Create a JSON with:
 1. **design_system** - All specifications (colors, fonts, layout, decorations)
 2. **prompt_template** - A natural language prompt for image generators
+3. **variation_guidance** - Explicit ranges for allowable layout/style randomness
 
 ## ABOUT COLORS
 
 For each color, provide:
-- `hex`: The exact color code (for developers/tools)
-- `name`: A descriptive name (for image generation prompts)
+- `hex`: The exact color code (for developers/tools). Sample from flat, unshaded areas (avoid shadows or gradients).
+- `name`: An optional descriptive name (only if it accurately matches the hex; keep it short and neutral)
 
-Image generators understand "vibrant magenta" better than "#FF58C1".
-Use the `name` field in prompt_template, keep `hex` for reference.
+Prioritize hex accuracy. Do not "correct" or shift colors to be more aesthetic; match what is visible.
+In the prompt_template, prefer palette references (primary/secondary/background) and only use a color name if it is clearly accurate.
+
+## TYPOGRAPHY DETAIL REQUIREMENTS
+
+For each typography style, include BOTH the font name (if known) and a quantitative shape description:
+- `x_height_ratio` (0.40-0.80)
+- `width_ratio` (condensed <0.90, normal 0.90-1.05, wide >1.05)
+- `stroke_contrast` ("none/low/medium/high")
+- `terminal_style` ("square/rounded/tapered/bracketed")
+- `aperture` ("open/neutral/closed")
+- `axis_angle_degrees` (e.g., 0 for upright, -10 for left-leaning)
+- `slant_degrees` (0 if upright)
+- `curvature` ("geometric/neo-grotesque/humanist/calligraphic")
+If the font is script or decorative, describe letter connections, stroke modulation, and loop size in measurable terms (e.g., "ascender loops ~1.2x x-height").
 
 ## ABOUT THE prompt_template
 
 The prompt_template is for image generation AI (DALL-E, Midjourney, etc).
 
 **CRITICAL**: These AIs can accidentally render text literally.
-- If you write "#FF58C1", it might appear AS TEXT in the image
-- If you write "-5 degrees", those characters might appear AS TEXT
+- Avoid hex codes in the prompt_template (use palette names like primary/secondary/background).
+- You MUST use numeric values for layout precision (percent/px and rotation degrees), but explicitly say: "Do not render numbers as text; numbers are layout constraints only."
 
-**USE DESCRIPTIVE LANGUAGE** in the prompt_template:
-- "vibrant magenta background" NOT "#FF58C1 background"
-- "slightly tilted to the left" NOT "-5 degrees rotation"
-- "large bold text" NOT "9% font size"
+**USE PRECISE, LLM-OPTIMIZED LANGUAGE** in the prompt_template:
+- Include exact positions, sizes, gaps, and rotation angles using numeric values.
+- If there is no visible tilt, explicitly state rotation is 0 degrees.
+- If an element touches an edge, say "flush to the edge" or "edge-to-edge" to prevent unintended padding.
+- If text uses multiple tilt directions, describe both orientations, counts, and how they interleave.
+- Prefer short, directive sentences over poetic language; prioritize constraints and layout facts.
+- If variation is allowed, describe the exact numeric range and say "randomize within this range."
 
-**CONTENT NUMBERS ARE FINE**: If the actual content has numbers (like "10 volunteers" or "2024"), those SHOULD appear. Only DESIGN SPECIFICATION values should be avoided.
+**CONTENT NUMBERS ARE FINE**: If the actual content has numbers (like "10 volunteers" or "2024"), those SHOULD appear. DESIGN SPECIFICATION values should be marked as layout constraints and not rendered.
 
 ## JSON STRUCTURE
 
@@ -269,41 +322,88 @@ The prompt_template is for image generation AI (DALL-E, Midjourney, etc).
     }},
 
     "typography": {{
-      "headline": {{
-        "font_family": "League Spartan",
-        "font_weight": 800,
-        "size_percent": 9,
-        "color": "text",
-        "transform": "uppercase",
-        "alignment": "left",
-        "rotation": 0,
-        "rotation_description": "horizontal"
+        "headline": {{
+          "font_family": "League Spartan",
+          "font_weight": 800,
+          "size_percent": 9,
+          "line_height": 1.0,
+          "letter_spacing": 0,
+          "color": "text",
+          "transform": "uppercase",
+          "alignment": "left",
+          "rotation": 0,
+          "rotation_description": "horizontal",
+          "font_characteristics": {{
+            "x_height_ratio": 0.72,
+            "width_ratio": 0.92,
+            "stroke_contrast": "low",
+            "terminal_style": "square",
+            "aperture": "open",
+            "axis_angle_degrees": 0,
+            "slant_degrees": 0,
+            "curvature": "neo-grotesque"
+          }}
+        }},
+        "subheadline": {{
+          "font_family": "Dancing Script",
+          "font_weight": 700,
+          "size_percent": 11,
+          "line_height": 0.95,
+          "letter_spacing": 0,
+          "color": "text",
+          "transform": "none",
+          "alignment": "center",
+          "rotation": 0,
+          "rotation_description": "horizontal",
+          "font_characteristics": {{
+            "x_height_ratio": 0.55,
+            "width_ratio": 1.05,
+            "stroke_contrast": "medium",
+            "terminal_style": "tapered",
+            "aperture": "open",
+            "axis_angle_degrees": -8,
+            "slant_degrees": -8,
+            "curvature": "calligraphic"
+          }}
+        }},
+        "body": {{
+          "font_family": "Montserrat",
+          "font_weight": 600,
+          "size_percent": 4,
+          "line_height": 1.3,
+          "letter_spacing": 0,
+          "color": "text",
+          "alignment": "left",
+          "font_characteristics": {{
+            "x_height_ratio": 0.70,
+            "width_ratio": 0.98,
+            "stroke_contrast": "low",
+            "terminal_style": "square",
+            "aperture": "neutral",
+            "axis_angle_degrees": 0,
+            "slant_degrees": 0,
+            "curvature": "geometric"
+          }}
+        }}
       }},
-      "subheadline": {{
-        "font_family": "Dancing Script",
-        "font_weight": 700,
-        "size_percent": 11,
-        "color": "text",
-        "transform": "none",
-        "alignment": "center",
-        "rotation": 0,
-        "rotation_description": "horizontal"
-      }},
-      "body": {{
-        "font_family": "Montserrat",
-        "font_weight": 600,
-        "size_percent": 4,
-        "color": "text",
-        "alignment": "left"
-      }}
-    }},
 
 ## VISUAL TAXONOMY (MANDATORY FOR ALL ELEMENTS)
 
-Every element MUST include a comprehensive `visual` object with relevant properties. Use token-optimized approach:
-- OMIT properties with default values (opacity_percent: 100, has_stroke: false, rotation_degrees: 0, etc.)
+Every element MUST include a comprehensive `visual` object with relevant properties. Token optimization applies ONLY to non-spatial visuals:
+- Do NOT omit quantitative layout values (position, size, gaps, rotation)
 - ONLY include properties relevant to the specific element type
-- Use compact representations where possible
+- Use compact representations where possible for non-spatial fields
+
+## SPATIAL PRECISION REQUIREMENTS
+
+- Provide explicit `position` values for every element (x/y/width/height). Avoid "auto" unless truly unavoidable for text.
+- Fill `edges` and `spacing` with real gaps. If an element touches an edge, set the touch flag true and gap to 0.
+- If an element appears only once, make that explicit; if repeated, list each instance or clearly describe counts and placements.
+- For any edge-touching element, explicitly describe it in the prompt_template as "flush to the [edge]" or "full-bleed/edge-to-edge" with no margin.
+- If any element is flush to the canvas edge, set `global_defaults.minimum_margin` to 0.
+- Do NOT use vague group placeholders like "12 phrases"; enumerate repeated elements with positions or provide a per-item list.
+- For text, always include font size (percent), line height, letter spacing, alignment, and rotation_degrees.
+- If layout variation is allowed, provide min/max ranges for position/size/rotation in a dedicated `variation_guidance` object.
 
 ### Core Visual Properties
 
@@ -382,13 +482,13 @@ Image with Mask:
 
 ### TOKEN OPTIMIZATION RULES
 
-CRITICAL: Balance maximum detail for image generation with minimal token usage:
-1. OMIT fields with default values (opacity_percent: 100, has_stroke: false, rotation_degrees: 0, blend_mode: "normal", etc.)
+CRITICAL: Precision overrides brevity for spatial and typographic fields.
+1. Do NOT omit quantitative layout values (position, size, gaps, rotation_degrees) even if they are 0.
 2. ONLY include fields relevant to the specific element type (don't add stroke properties to elements without strokes)
-3. Use compact representations: combine related properties (e.g., "shadow_color: 'soft black 20%'" instead of separate opacity field)
+3. Use compact representations for non-spatial visuals (e.g., "shadow_color: 'soft black 20%'" instead of separate opacity field)
 4. Be comprehensive but concise: include every detail needed for recreation, nothing more
 
-Goal: 60-75% token reduction while maintaining 100% specification completeness.
+Goal: prioritize accuracy over token reduction when in conflict.
 
     "elements": [
       {{
@@ -480,13 +580,13 @@ Goal: 60-75% token reduction while maintaining 100% specification completeness.
       }}
     ],
 
-    "global_defaults": {{
-      "minimum_margin": 8,
-      "default_corner_radius": 0,
-      "default_shadow": "none",
-      "default_border": "none",
-      "notes": "Defaults that apply unless overridden in individual elements"
-    }}
+  "global_defaults": {{
+    "minimum_margin": 8,
+    "default_corner_radius": 0,
+    "default_shadow": "none",
+    "default_border": "none",
+    "notes": "Defaults that apply unless overridden in individual elements"
+  }}
   }},
 
   "brand_style": {{
@@ -495,7 +595,7 @@ Goal: 60-75% token reduction while maintaining 100% specification completeness.
     "avoid": ["dark colors", "harsh shadows", "cluttered layouts", "thin fonts"]
   }},
 
-  "prompt_template": "YOUR TASK: Write a detailed natural language prompt here that describes the COMPLETE design. This prompt will be given to an image generation AI. It must describe every element, its position, its styling, and its relationship to other elements and edges. Use color NAMES not hex codes. Use relative sizes (large, medium, small) not percentages. Describe the full spatial extent of every element (where it starts AND ends in all directions), not just its starting position. An artist reading this should be able to recreate the design exactly.",
+  "prompt_template": "YOUR TASK: Write a detailed natural language prompt here that describes the COMPLETE base template. This prompt will be given to an image generation AI. It must describe every element, its position, its styling, and its relationship to other elements and edges. Use palette references (primary/secondary/background) and only use color NAMES if they are clearly accurate; never use hex codes. Use explicit numeric sizes and placements (percent/px), and include rotation degrees where relevant. Add a clear instruction: 'Do not render numbers as text; numbers are layout constraints only.' Describe the full spatial extent of every element (where it starts AND ends in all directions), not just its starting position. If variation is allowed, include numeric ranges and say 'randomize within this range'. An artist reading this should be able to recreate the base template and its allowed variations.",
 
   "generation_instructions": {{
     "required": [
@@ -508,7 +608,25 @@ Goal: 60-75% token reduction while maintaining 100% specification completeness.
       "NOTE: Content numbers ARE allowed (e.g., '10 volunteers', 'Chapter 5', '2024')",
       "NOTE: Only DESIGN SPECIFICATION values should be hidden, not content"
     ],
-    "notes": "Technical values in design_system are for programmatic reference. The prompt_template uses descriptive names for image generation."
+    "notes": "Technical values in design_system are for programmatic reference. The prompt_template uses palette references and only uses color names when they are clearly accurate."
+  }},
+
+  "variation_guidance": {{
+    "randomness_level": 0.35,
+    "layout_variation_percent": 15,
+    "position_jitter_percent": 4,
+    "scale_range_percent": [90, 110],
+    "rotation_jitter_degrees": [-8, 8],
+    "allowed_variations": [
+      "Shuffle the relative placement of secondary elements while keeping primary hierarchy",
+      "Vary spacing within the specified gap ranges",
+      "Alternate between two tilt directions if specified"
+    ],
+    "non_negotiables": [
+      "Keep required elements present",
+      "Respect edge-touching elements as flush",
+      "Do not violate minimum spacing rules"
+    ]
   }},
 
   "image_sequence": {{
@@ -614,20 +732,31 @@ Goal: 60-75% token reduction while maintaining 100% specification completeness.
 1. **Analyze Post 1 thoroughly** - this is your primary reference
 2. **Validate patterns** - check which elements from Post 1 appear in other posts
 3. **Extract design_system** - all colors (hex + name), fonts, layout, decorations
-4. **Write prompt_template** - using DESCRIPTIVE language only (no hex codes, no percentages, no degree values)
+4. **Write prompt_template** - use precise, LLM-optimized language with numeric layout constraints (percent/px and rotation degrees), and explicitly instruct not to render numbers as text
 5. **Fill generation_instructions** - list required and forbidden elements
+6. **Fill variation_guidance** - define allowable randomness ranges and non-negotiables
 
 ## ZERO AMBIGUITY RULE
 
 Every description must be EXHAUSTIVELY SPECIFIC. An image generator should have ZERO questions. If there is ANY room for interpretation, you have FAILED.
+- Do not hallucinate: omit details that are not clearly visible (e.g., tilt, extra icons, extra decorations).
+- Specify exact counts and placements of repeated elements.
+- Call out edge-touching elements explicitly (gap = 0 where relevant).
+- If the layout is intentionally uneven or staggered, state that explicitly (do not imply uniform spacing).
 
-**THE GOLDEN RULE**: After reading your output, an artist in a completely different country who has NEVER seen the original posts should be able to recreate the design with 95%+ accuracy. If they would need to guess ANYTHING, your description is incomplete.
+**THE GOLDEN RULE**: After reading your output, an artist in a completely different country who has NEVER seen the original posts should be able to recreate the BASE TEMPLATE and apply the allowed variation ranges with 95%+ accuracy. If they would need to guess ANYTHING, your description is incomplete.
 
-**SPATIAL COMPLETENESS**: For every element, describe its FULL extent in all directions - not just where it starts, but where it ends. State explicit boundaries: "extends from X to Y" or "fills the entire bottom third" or "occupies 50% width centered". Never describe only position without also describing complete coverage.
+**SPATIAL COMPLETENESS**: For every element, describe its FULL extent in all directions - not just where it starts, but where it ends. State explicit boundaries: "extends from X to Y" or "fills the entire bottom third" or "occupies 50% width centered". Never describe only position without also describing complete coverage. If variation is allowed, give explicit min/max bounds.
 
 **FOR EVERY ELEMENT YOU IDENTIFY, SPECIFY:**
 
-1. **Edge Relationship** (MANDATORY - never skip)
+  0. **Quantitative Metrics** (MANDATORY - never skip)
+     - Exact width/height as % of canvas (and px if possible)
+     - Exact x/y position as % of canvas
+     - Rotation degrees (0 if none)
+     - Text line height and letter spacing (if text)
+
+  1. **Edge Relationship** (MANDATORY - never skip)
    - Does this element touch the top edge of the canvas? Yes/No
    - Does this element touch the bottom edge? Yes/No
    - Does this element touch the left edge? Yes/No
@@ -704,8 +833,11 @@ Before submitting, verify ALL of the following:
 - [ ] Based primarily on Post 1?
 - [ ] Patterns validated across posts?
 - [ ] Every color has `hex` AND `name`?
-- [ ] prompt_template has NO technical values (hex codes, numbers, percentages)?
+- [ ] prompt_template includes numeric layout constraints AND explicitly says not to render numbers as text?
 - [ ] Every element passes the universal checklist above?
+- [ ] Are gaps and edge contacts explicitly defined (no missing spacing)?
+- [ ] Are counts of icons/decorations explicit with no duplicates added?
+- [ ] `variation_guidance` includes numeric ranges and non-negotiables?
 
 **New Section Requirements:**
 - [ ] `image_sequence` filled out if post is a carousel (or `is_carousel: false` if single image)?
@@ -713,7 +845,7 @@ Before submitting, verify ALL of the following:
 - [ ] `placeholder_guidance` provides on-brand content suggestions for text, numbers, images, and dates?
 
 **Zero Ambiguity Test:**
-- [ ] Could an artist who has NEVER seen the original recreate it with 95%+ accuracy?
+- [ ] Could an artist who has NEVER seen the original recreate the base template + variation ranges with 95%+ accuracy?
 - [ ] Are there ANY vague words like "approximately", "near", "slightly", "somewhat"?
 - [ ] Is EVERY element's position, spacing, and styling explicitly defined?
 - [ ] Does the prompt_template describe exact placement using natural language (not just "top-right" but "positioned in the top-right corner, with an 8% margin from the top edge and 5% margin from the right edge")?
@@ -818,21 +950,11 @@ def validate_prompt_template(analysis_json):
     if re.search(r'#[0-9A-Fa-f]{3,8}', prompt):
         issues.append("hex codes (e.g., #FF58C1)")
 
-    # Check for percentages
-    if re.search(r'\d+%', prompt):
-        issues.append("percentage values (e.g., 8%)")
-
-    # Check for degree measurements
-    if re.search(r'-?\d+\s*(degrees?|deg|\u00b0)', prompt, re.IGNORECASE):
-        issues.append("degree measurements")
-
-    # Check for pixel measurements
-    if re.search(r'\d+\s*px', prompt, re.IGNORECASE):
-        issues.append("pixel values")
-
     if issues:
         print(f"Warning: prompt_template contains raw values: {', '.join(issues)}")
-        print("  These may render as visible text. Use descriptive names instead.")
+        print("  These may render as visible text. Avoid hex codes and use palette names instead.")
+    if "do not render numbers" not in prompt.lower():
+        print("Warning: prompt_template missing numeric constraint note (e.g., 'Do not render numbers as text').")
 
 
 def analyze_posts_with_gemini(posts):
@@ -1315,10 +1437,12 @@ def build_category_selector(category_data):
     }
 
 
-def assemble_final_json(category_data, category_analyses, posts):
+def assemble_final_json(category_data, category_analyses, posts, instagram_profile):
     """
     Combine Phase 1 + Phase 2 results.
-    Add analysis_metadata, universal_design_elements, cross_category_patterns, generation_category_selector.
+    Returns a tuple: (main_json, category_jsons_dict)
+    - main_json: Contains organization info, metadata, universal elements, cross-category patterns
+    - category_jsons_dict: {category_id: category_json} for each category
     """
     from datetime import datetime
 
@@ -1351,25 +1475,80 @@ def assemble_final_json(category_data, category_analyses, posts):
         if rec.get('reasoning'):
             recommendation_reasoning = rec['reasoning']
 
-    return {
-        "analysis_metadata": {
-            "total_posts_analyzed": len(posts),
-            "categories_detected": len(category_data['categories']),
-            "analysis_timestamp": datetime.now().isoformat(),
-            "primary_category": primary_category_id,
-            "recommended_category_for_generation": {
-                "category_id": recommended_category_id,
-                "confidence": confidence,
-                "reasoning": recommendation_reasoning,
-                "recommendation_source": "most_recent_post",
-                "alternative_selection_method": "Use generation_category_selector for content-based matching"
-            }
+    # Extract organization name from Instagram profile URL
+    org_name = instagram_profile.rstrip('/').split('/')[-1].replace('_', ' ').title()
+
+    # Build minimal main JSON with only essential generation info
+    universal_elements = extract_universal_elements(category_data, category_analyses)
+
+    main_json = {
+        "organization_name": org_name,
+        "generation_directives": {
+            "follow_json_strictly": True,
+            "ignore_model_defaults": True,
+            "note": "Follow this JSON exactly. Ignore any default padding, layout heuristics, or prior restrictions that conflict with these rules."
         },
-        "categories": category_analyses,
-        "universal_design_elements": extract_universal_elements(category_data, category_analyses),
-        "cross_category_patterns": infer_cross_category_patterns(category_analyses),
-        "generation_category_selector": build_category_selector(category_data)
+        "randomness": {
+            "layout_variation_strength": 0.35,
+            "random_seed": int(datetime.utcnow().timestamp())
+        }
     }
+
+    # Only include universal elements that are actually consistent and useful for generation
+    if universal_elements.get('canvas', {}).get('width'):
+        main_json['canvas'] = {
+            "width": universal_elements['canvas']['width'],
+            "height": universal_elements['canvas']['height'],
+            "aspect_ratio": universal_elements['canvas']['aspect_ratio']
+        }
+
+    if universal_elements.get('fonts', {}).get('consistent') and universal_elements['fonts'].get('universal_fonts'):
+        main_json['fonts'] = universal_elements['fonts']['universal_fonts']
+
+    if universal_elements.get('logo', {}).get('consistent_position'):
+        main_json['logo_position'] = universal_elements['logo']['universal_position']
+
+    if universal_elements.get('brand_colors', {}).get('core_colors'):
+        main_json['brand_colors'] = universal_elements['brand_colors']['core_colors']
+
+    # Build category JSONs - one for each category
+    category_jsons = {}
+    for cat_analysis in category_analyses:
+        category_id = cat_analysis.get('category_id', 'unknown')
+
+        # Build category JSON with all design system details
+        category_json = {
+            "category_info": {
+                "category_id": category_id,
+                "category_name": cat_analysis.get('category_name', 'Unknown'),
+                "category_description": cat_analysis.get('category_description', ''),
+                "posts_included": cat_analysis.get('posts_included', []),
+                "post_count": cat_analysis.get('post_count', 0)
+            },
+            "trend_classification": {
+                "trend_type_primary": cat_analysis.get('trend_type_primary', 'unknown'),
+                "trend_types_secondary": cat_analysis.get('trend_types_secondary', []),
+                "trend_type_reasoning": cat_analysis.get('trend_type_reasoning', '')
+            },
+            "purpose_analysis": {
+                "purpose": cat_analysis.get('purpose', 'unknown'),
+                "purpose_correlation": cat_analysis.get('purpose_correlation', ''),
+                "color_palette_notes": cat_analysis.get('color_palette_notes', '')
+            },
+            "consistency_tracking": cat_analysis.get('consistency_tracking', {}),
+            "design_system": cat_analysis.get('design_system', {}),
+            "brand_style": cat_analysis.get('brand_style', {}),
+            "prompt_template": cat_analysis.get('prompt_template', ''),
+            "generation_instructions": cat_analysis.get('generation_instructions', {}),
+            "variation_guidance": cat_analysis.get('variation_guidance', {}),
+            "image_sequence": cat_analysis.get('image_sequence', {}),
+            "asset_recreation": cat_analysis.get('asset_recreation', {}),
+            "placeholder_guidance": cat_analysis.get('placeholder_guidance', {})
+        }
+
+        category_jsons[category_id] = category_json
+
+    return main_json, category_jsons
 
 
 def analyze_category_with_gemini(posts, category_metadata):
@@ -1546,12 +1725,19 @@ Focus your analysis on the design patterns specific to this category.
     return analysis_json
 
 
-def analyze_posts_with_categories(posts):
+def analyze_posts_with_categories(posts, instagram_profile):
     """
     Full two-phase analysis with category detection and per-category analysis.
     1. Detect categories (Phase 1)
     2. Analyze each category in parallel (Phase 2)
-    3. Assemble final JSON structure
+    3. Assemble final JSON structure (split into main + category JSONs)
+
+    Args:
+        posts: List of Instagram posts to analyze
+        instagram_profile: Instagram profile URL (e.g., "https://www.instagram.com/username/")
+
+    Returns:
+        Tuple of (main_json, category_jsons_dict)
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -1570,29 +1756,49 @@ def analyze_posts_with_categories(posts):
         print("Warning: No categories detected, falling back to single analysis")
         # Fallback: analyze all posts as one category
         analysis = analyze_posts_with_gemini(posts)
-        return {
-            "analysis_metadata": {
-                "total_posts_analyzed": len(posts),
-                "categories_detected": 1,
-                "analysis_timestamp": datetime.now().isoformat(),
-                "primary_category": "fallback_single_category",
-                "note": "Category detection failed, using fallback single analysis"
-            },
-            "categories": [
-                {
-                    "category_id": "fallback_single_category",
-                    "category_name": "All Posts",
-                    "category_description": "All posts analyzed as single category (fallback)",
-                    "posts_included": list(range(1, len(posts) + 1)),
-                    "post_count": len(posts),
-                    "purpose": "mixed",
-                    **analysis
-                }
-            ],
-            "universal_design_elements": extract_universal_elements(category_data, [analysis]),
-            "cross_category_patterns": {},
-            "generation_category_selector": {"available_categories": ["fallback_single_category"], "selection_logic": {}}
+
+        # Build fallback main JSON and category JSON (minimal structure)
+        org_name = instagram_profile.rstrip('/').split('/')[-1].replace('_', ' ').title()
+        universal_elements = extract_universal_elements(category_data, [analysis])
+
+        main_json = {
+            "organization_name": org_name
         }
+
+        # Only include universal elements that are actually consistent
+        if universal_elements.get('canvas', {}).get('width'):
+            main_json['canvas'] = {
+                "width": universal_elements['canvas']['width'],
+                "height": universal_elements['canvas']['height'],
+                "aspect_ratio": universal_elements['canvas']['aspect_ratio']
+            }
+
+        if universal_elements.get('fonts', {}).get('consistent') and universal_elements['fonts'].get('universal_fonts'):
+            main_json['fonts'] = universal_elements['fonts']['universal_fonts']
+
+        if universal_elements.get('logo', {}).get('consistent_position'):
+            main_json['logo_position'] = universal_elements['logo']['universal_position']
+
+        if universal_elements.get('brand_colors', {}).get('core_colors'):
+            main_json['brand_colors'] = universal_elements['brand_colors']['core_colors']
+
+        category_json = {
+            "category_info": {
+                "category_id": "fallback_single_category",
+                "category_name": "All Posts",
+                "category_description": "All posts analyzed as single category (fallback)",
+                "posts_included": list(range(1, len(posts) + 1)),
+                "post_count": len(posts)
+            },
+            "purpose_analysis": {
+                "purpose": "mixed",
+                "purpose_correlation": "N/A",
+                "color_palette_notes": "N/A"
+            },
+            **{k: v for k, v in analysis.items() if k not in ['category_id', 'category_name', 'category_description', 'posts_included', 'post_count']}
+        }
+
+        return main_json, {"fallback_single_category": category_json}
 
     num_categories = len(category_data['categories'])
     print(f"\nDetected {num_categories} categories:")
@@ -1644,7 +1850,7 @@ def analyze_posts_with_categories(posts):
     print("PHASE 3: ASSEMBLING FINAL RESULTS")
     print("=" * 60)
 
-    final_result = assemble_final_json(category_data, category_analyses, posts)
+    main_json, category_jsons = assemble_final_json(category_data, category_analyses, posts, instagram_profile)
 
     print("[OK] Assembly complete!")
     print()
@@ -1652,7 +1858,7 @@ def analyze_posts_with_categories(posts):
     print("TWO-PHASE ANALYSIS COMPLETE")
     print("=" * 60)
 
-    return final_result
+    return main_json, category_jsons
 
 
 if __name__ == "__main__":
